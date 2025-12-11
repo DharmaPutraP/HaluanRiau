@@ -34,7 +34,7 @@ function GambarHeadline({ data = [] }) {
           {data.map((item, index) => (
             <img
               key={index}
-              src="image.png"
+              src="/image.png"
               alt={item.judul}
               className={`w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-700 ease-in-out ${
                 currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"

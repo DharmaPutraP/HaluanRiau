@@ -49,7 +49,7 @@ function Navbar() {
           }`}
         >
           <img
-            src="Logo.png"
+            src="/Logo.png"
             alt="Logo Haluan Riau"
             className={`transition-all duration-300 ${
               isScrolled ? "w-40" : "w-3xs"
@@ -93,7 +93,7 @@ function Navbar() {
 
               {/* Mobile: Center Logo */}
               <div className="md:hidden flex-1 flex justify-center">
-                <img src="Logo.png" alt="Logo Haluan Riau" className="h-8" />
+                <img src="/Logo.png" alt="Logo Haluan Riau" className="h-8" />
               </div>
 
               {/* Mobile: Search Icon */}
@@ -129,17 +129,29 @@ function Navbar() {
 
               {/* Desktop Left Navigation */}
               <div className="hidden md:flex items-center space-x-6">
-                <a href="#" className="text-sm font-medium hover:text-gray-200">
+                <a
+                  href="/category/nasional"
+                  className="text-sm font-medium hover:text-gray-200"
+                >
                   NASIONAL
                 </a>
-                <a href="#" className="text-sm font-medium hover:text-gray-200">
+                <a
+                  href="/category/ekonomi"
+                  className="text-sm font-medium hover:text-gray-200"
+                >
                   EKONOMI
                 </a>
-                <a href="#" className="text-sm font-medium hover:text-gray-200">
+                <a
+                  href="/category/politik"
+                  className="text-sm font-medium hover:text-gray-200"
+                >
                   POLITIK
                 </a>
-                <a href="#" className="text-sm font-medium hover:text-gray-200">
-                  EKONOMI
+                <a
+                  href="/category/olahraga"
+                  className="text-sm font-medium hover:text-gray-200"
+                >
+                  OLAHRAGA
                 </a>
 
                 {/* LAINNYA Dropdown */}
@@ -170,7 +182,9 @@ function Navbar() {
                       {LAINNYA.map((item, index) => (
                         <a
                           key={index}
-                          href="#"
+                          href={`/category/${item
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
                           className="block px-4 py-2 hover:bg-gray-100 capitalize"
                         >
                           {item}
@@ -208,7 +222,9 @@ function Navbar() {
                       {DAERAH.map((item, index) => (
                         <a
                           key={index}
-                          href="#"
+                          href={`/category/${item
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
                           className="block px-4 py-2 hover:bg-gray-100 capitalize"
                         >
                           {item}
@@ -221,7 +237,10 @@ function Navbar() {
 
               {/* Desktop Right Side - Ticker & Search */}
               <div className="hidden md:flex items-center space-x-4">
-                <a href="#" className="text-sm font-medium hover:text-gray-200">
+                <a
+                  href="/category/headline"
+                  className="text-sm font-medium hover:text-gray-200"
+                >
                   INDEKS BERITA +
                 </a>
 
@@ -287,7 +306,7 @@ function Navbar() {
             >
               <div className="p-4">
                 <a
-                  href="#"
+                  href="/"
                   className="flex items-center text-lg font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   <svg
@@ -306,55 +325,58 @@ function Navbar() {
                   Home
                 </a>
                 <a
-                  href="#"
+                  href="/category/kampar"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   KAMPAR
                 </a>
                 <a
-                  href="#"
+                  href="/category/pelalawan"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   PELALAWAN
                 </a>
                 <a
-                  href="#"
+                  href="/category/pemilu-2024"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   Pemilu 2024
                 </a>
                 <a
-                  href="#"
+                  href="/category/pilkada-2024"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   Pilkada 2024
                 </a>
                 <a
-                  href="#"
+                  href="/category/mudik-lebaran-2024"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   Mudik Lebaran 2024
                 </a>
                 <a
-                  href="#"
+                  href="/category/pendidikan"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   Pendidikan
                 </a>
                 <a
-                  href="#"
+                  href="/category/pekanbaru"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   PEKANBARU
                 </a>
                 <a
-                  href="#"
+                  href="/category/info-haji-2025"
                   className="block text-base font-medium py-3 border-b hover:text-[#EE4339]"
                 >
                   INFO HAJI 2025
                 </a>
-                <button className="flex items-center justify-between w-full text-base font-medium py-3 hover:text-[#EE4339]">
-                  <span>More</span>
+                <a
+                  href="/category/headline"
+                  className="flex items-center justify-between w-full text-base font-medium py-3 hover:text-[#EE4339]"
+                >
+                  <span>Semua Berita</span>
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -368,7 +390,7 @@ function Navbar() {
                       d="M9 5l7 7-7 7"
                     />
                   </svg>
-                </button>
+                </a>
               </div>
             </div>
           </div>

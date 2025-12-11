@@ -1,10 +1,14 @@
 function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-300 mt-2 py-8 px-5 md:px-16">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-white border-t border-gray-300 mt-2 py-6 md:py-8 px-5 md:px-16">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
         {/* Left Section - Logo and Social Media */}
-        <div className="flex flex-col justify-center">
-          <img src="Logo.png" alt="Riau Mandiri Logo" className="w-64 mb-4" />
+        <div className="flex flex-col justify-center items-center md:items-start">
+          <img
+            src="/Logo.png"
+            alt="Riau Mandiri Logo"
+            className="w-48 md:w-64 mb-4"
+          />
 
           {/* Social Media Icons */}
           <div className="flex gap-3 mb-4">
@@ -13,7 +17,7 @@ function Footer() {
               className="w-10 h-10 flex items-center justify-center border border-gray-400 rounded hover:bg-gray-200 transition"
             >
               <img
-                src="instagramIcon.png"
+                src="/instagramIcon.png"
                 alt="Instagram"
                 className="w-6 h-6"
               />
@@ -22,19 +26,19 @@ function Footer() {
               href="#"
               className="w-10 h-10 flex items-center justify-center border border-gray-400 rounded hover:bg-gray-200 transition"
             >
-              <img src="xIcon.png" alt="X/Twitter" className="w-6 h-6" />
+              <img src="/xIcon.png" alt="X/Twitter" className="w-6 h-6" />
             </a>
             <a
               href="#"
               className="w-10 h-10 flex items-center justify-center border border-gray-400 rounded hover:bg-gray-200 transition"
             >
-              <img src="facebookIcon.png" alt="Facebook" className="w-6 h-6" />
+              <img src="/facebookIcon.png" alt="Facebook" className="w-6 h-6" />
             </a>
             <a
               href="#"
               className="w-10 h-10 flex items-center justify-center border border-gray-400 rounded hover:bg-gray-200 transition"
             >
-              <img src="gPlusIcon.png" alt="Google Plus" className="w-6 h-6" />
+              <img src="/gPlusIcon.png" alt="Google Plus" className="w-6 h-6" />
             </a>
           </div>
 
@@ -45,8 +49,10 @@ function Footer() {
         </div>
 
         {/* Middle Section - Navigasi */}
-        <div className="ps-10 border-s-2">
-          <h3 className="font-bold text-lg mb-4">NAVIGASI</h3>
+        <div className="md:ps-10 md:border-s-2">
+          <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
+            NAVIGASI
+          </h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>
               <a href="#" className="hover:text-[#EE4339]">
@@ -77,8 +83,8 @@ function Footer() {
         </div>
 
         {/* Middle-Right Section - Kanal */}
-        <div className="ps-10  border-s border-gray-300">
-          <h3 className="font-bold text-lg mb-4">KANAL</h3>
+        <div className="md:ps-10 md:border-s border-gray-300">
+          <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">KANAL</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>
               <a href="#" className="hover:text-[#EE4339]">
@@ -130,9 +136,11 @@ function Footer() {
         </div>
 
         {/* Right Section - Kontak (hidden on mobile in original, but showing for better UX) */}
-        <div className="md:block ps-10 border-s border-gray-300 ">
-          <h3 className="font-bold text-lg mb-4">KONTAK</h3>
-          <ul className="space-y-3 text-sm text-gray-700">
+        <div className="md:block md:ps-10 md:border-s border-gray-300">
+          <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
+            KONTAK
+          </h3>
+          <ul className="space-y-2 md:space-y-3 text-xs md:text-sm text-gray-700">
             <li className="flex items-start gap-2">
               <svg
                 className="w-5 h-5 text-gray-600 shrink-0 mt-0.5"

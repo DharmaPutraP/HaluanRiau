@@ -74,7 +74,7 @@ export const HEADLINES = [
     judul:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit voluptate",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec justo tortor, feugiat et ullamcorper nec, consectetur eget risus. Etiam in nisl eget risus blandit ornare. Fusce eu turpis in urna ultricies placerat. Proin lobortis sem et sapien blandit ornare. Pellentesque scelerisque finibus tincidunt. Ut et tincidunt augue. Duis et sollicitudin neque. Proin commodo tellus ipsum, eget blandit turpis fermentum sit amet. Praesent ornare purus at volutpat efficitur. Mauris sodales tristique erat ut tincidunt. Nulla laoreet et quam eget posuere. Curabitur congue et elit id vehicula. Suspendisse ac volutpat arcu.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     tanggal: "11 September 2025",
     lastUpdated: "12:30 WIB",
     tag: "LOKAL",
@@ -193,4 +193,4 @@ export const DAERAH = [
   "indragiri hilir",
   "kuantan singingi",
   "kepulauan meranti",
-]
+];

@@ -1,7 +1,6 @@
-import { PILIHANEDITOR } from "../../utils/constants";
 import Tag from "../Tag";
-function Terpopuler() {
-  const topFive = PILIHANEDITOR.slice(0, 5);
+function Terpopuler({ data = [] }) {
+  const topFive = data.slice(0, 5);
 
   return (
     <>

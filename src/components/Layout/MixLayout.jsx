@@ -1,7 +1,6 @@
 import BasicArtikel from "../BasicArtikel";
-import { PILIHANEDITOR } from "../../utils/constants";
-function MixLayout({ title }) {
-  const topFive = PILIHANEDITOR.slice(0, 5);
+function MixLayout({ title, data = [] }) {
+  const topFive = data.slice(0, 5);
 
   // Convert title to URL-friendly format
   const getUrl = (title) => {

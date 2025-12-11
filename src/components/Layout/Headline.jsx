@@ -1,10 +1,9 @@
 import LeftHeadline from "../Headline/LeftHeadline";
 import GambarHeadline from "../Headline/GambarHeadline";
-import { HEADLINES } from "../../utils/constants";
 
-function Headline() {
+function Headline({ data = [] }) {
   // Get first 7 headlines
-  const headlines = HEADLINES.slice(0, 7);
+  const headlines = data.slice(0, 7);
 
   // Top 3 for middle (GambarHeadline)
   const middleHeadlines = headlines.slice(0, 3);

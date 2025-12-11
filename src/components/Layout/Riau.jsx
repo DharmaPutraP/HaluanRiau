@@ -1,10 +1,9 @@
-import { PILIHANEDITOR } from "../../utils/constants";
 import BasicArtikel from "../BasicArtikel";
 import Button from "../Button";
 
-function Riau() {
-  const topFive = PILIHANEDITOR.slice(0, 5);
-  const topSix = PILIHANEDITOR.slice(0, 6);
+function Riau({ data = [] }) {
+  const topFive = data.slice(0, 5);
+  const topSix = data.slice(0, 6);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
       <div className="border-b-3 w-fit border-[#EE4339] mb-3 items-center mx-auto flex gap-2">

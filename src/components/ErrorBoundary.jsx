@@ -63,7 +63,7 @@ function ErrorFallback({ error }) {
         {/* Error Details (Development Only) */}
         {process.env.NODE_ENV === "development" && error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-left">
-            <p className="font-mono text-sm text-red-800 break-words">
+            <p className="font-mono text-sm text-red-800 wrap-break-word">
               {error.toString()}
             </p>
           </div>

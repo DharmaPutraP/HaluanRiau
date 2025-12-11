@@ -1,10 +1,9 @@
 import React from "react";
 import MenuPilihanEditor from "../MenuPilihanEditor";
-import { PILIHANEDITOR } from "../../utils/constants";
 
-function PilihanEditor() {
-  const topFive = PILIHANEDITOR.slice(0, 5);
-  const topSix = PILIHANEDITOR.slice(0, 6);
+function PilihanEditor({ data = [] }) {
+  const topFive = data.slice(0, 5);
+  const topSix = data.slice(0, 6);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
       <div className="flex gap-2 border-b-3 w-fit border-[#EE4339] mb-3 items-center">

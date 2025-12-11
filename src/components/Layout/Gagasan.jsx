@@ -1,9 +1,8 @@
 import BasicArtikel from "../BasicArtikel";
-import { PILIHANEDITOR } from "../../utils/constants";
 import Tag from "../Tag";
 
-function Gagasan() {
-  const gagasan = PILIHANEDITOR.slice(0, 2);
+function Gagasan({ data = [] }) {
+  const gagasan = data.slice(0, 2);
 
   return (
     <>

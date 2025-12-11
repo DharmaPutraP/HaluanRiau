@@ -1,7 +1,8 @@
-function Button({ text = "Button", className = "" }) {
+function Button({ text = "Button", className = "", onClick }) {
   return (
     <div
       className={`bg-[#EE4339] rounded-md w-fit px-5 py-1 text-white flex items-center ${className}`}
+      onClick={onClick}
     >
       {text}
       <svg

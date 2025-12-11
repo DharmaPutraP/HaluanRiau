@@ -110,7 +110,7 @@ function Video() {
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-6 md:px-10"
+            className="flex gap-2 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-4 md:px-10"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {videos.map((video, index) => (
@@ -119,7 +119,7 @@ function Video() {
                 href={video.tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 w-[200px] md:w-60 h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
+                className="shrink-0 w-[160px] sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
               >
                 <iframe
                   src={video.embedUrl}
@@ -133,10 +133,10 @@ function Video() {
             {/* See More Link */}
             <a
               href="/videos"
-              className="shrink-0 w-[200px] md:w-60 h-[350px] md:h-[420px] bg-linear-to-br from-[#EE4339] to-[#d63330] rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
+              className="shrink-0 w-[160px] sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-linear-to-br from-[#EE4339] to-[#d63330] rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
             >
               <svg
-                className="w-16 h-16 md:w-20 md:h-20 mb-4"
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-3 md:mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

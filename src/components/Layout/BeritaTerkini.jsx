@@ -1,15 +1,14 @@
 import Tag from "../Tag";
-import { HEADLINES } from "../../utils/constants";
 import Button from "../Button";
 
-function BeritaTerkini() {
-  const headlines = HEADLINES.slice(0, 10);
+function BeritaTerkini({ data = [] }) {
+  const headlines = data.slice(0, 10);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
       <div className="flex gap-2 border-b-3 w-fit border-[#EE4339] mb-3 items-center">
         <div className="font-bold">BERITA TERKINI</div>
         <a
-          href="/category/berita-terkini"
+          href="/category/indeks-berita"
           className="cursor-pointer hover:opacity-70 transition-opacity"
         >
           <svg
@@ -64,7 +63,11 @@ function BeritaTerkiniComponent({ data = [] }) {
         </div>
       ))}
       <div className="flex justify-center">
-        <Button text="INDEKS BERITA" className="text-sm" />
+        <Button
+          text="INDEKS BERITA"
+          className="text-sm cursor-pointer"
+          onClick={() => (window.location.href = "/category/indeks-berita")}
+        />
       </div>
     </div>
   );
