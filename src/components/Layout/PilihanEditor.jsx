@@ -30,31 +30,35 @@ function PilihanEditor({ data = [] }) {
           <div
             key={index}
             className={`${
-              index !== 0 ? "ps-8 border-l border-gray-300" : ""
+              index !== 0 ? "ps-4 ms-4 border-l border-gray-300" : ""
             } w-full`}
-          >
-            <MenuPilihanEditor
-              judul={item.judul}
-              image={item.gambar}
-              tanggal={item.tanggal}
-              tag={item.tag}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Mobile: Single column layout */}
-      <div className="md:hidden flex flex-wrap justify-center">
-        {topSix.map((item, index) => (
-          <div
-            key={index}
-            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-1/2`}
           >
             <MenuPilihanEditor
               judul={item.judul}
               gambar={item.gambar}
               tanggal={item.tanggal}
               tag={item.tag}
+              id={item.id}
+              url={item.url}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile: Single column layout */}
+      <div className="md:hidden flex flex-wrap justify-center items-center">
+        {topSix.map((item, index) => (
+          <div
+            key={index}
+            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-full`}
+          >
+            <MenuPilihanEditor
+              judul={item.judul}
+              gambar={item.gambar}
+              tanggal={item.tanggal}
+              tag={item.tag}
+              id={item.id}
+              url={item.url}
             />
           </div>
         ))}

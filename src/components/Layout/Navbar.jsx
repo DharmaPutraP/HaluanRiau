@@ -1,12 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import { LAINNYA, DAERAH } from "../../utils/constants";
 
 function Navbar() {
+  const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDesktopSearchOpen, setIsDesktopSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +22,21 @@ function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsDesktopSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const toggleDropdown = (menu) => {
@@ -29,6 +51,24 @@ function Navbar() {
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleDesktopSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search/${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsDesktopSearchOpen(false);
+    }
+  };
+
+  const handleMobileSearch = (e) => {
+    e.preventDefault();
+    if (mobileSearchQuery.trim()) {
+      navigate(`/search/${encodeURIComponent(mobileSearchQuery.trim())}`);
+      setMobileSearchQuery("");
+      setIsSearchOpen(false);
+    }
   };
 
   return (
@@ -48,13 +88,15 @@ function Navbar() {
             isScrolled ? "py-2" : "py-5"
           }`}
         >
-          <img
-            src="/Logo.png"
-            alt="Logo Haluan Riau"
-            className={`transition-all duration-300 ${
-              isScrolled ? "w-40" : "w-3xs"
-            }`}
-          />
+          <a href="/">
+            <img
+              src="/Logo.png"
+              alt="Logo Haluan Riau"
+              className={`transition-all duration-300 ${
+                isScrolled ? "w-40" : "w-3xs"
+              }`}
+            />
+          </a>
         </div>
 
         <nav className="bg-white md:bg-[#EE4339] text-white md:px-24">
@@ -128,7 +170,10 @@ function Navbar() {
               </button>
 
               {/* Desktop Left Navigation */}
-              <div className="hidden md:flex items-center space-x-6">
+              <div
+                className="hidden md:flex items-center space-x-6"
+                ref={dropdownRef}
+              >
                 <a
                   href="/category/nasional"
                   className="text-sm font-medium hover:text-gray-200"
@@ -244,16 +289,37 @@ function Navbar() {
                   INDEKS BERITA +
                 </a>
 
-                {/* Search Bar */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="bg-white text-gray-800 rounded-full px-4 py-1 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2">
+                {/* Animated Search Bar */}
+                <form
+                  onSubmit={handleDesktopSearch}
+                  className="relative flex items-center"
+                  ref={searchRef}
+                >
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isDesktopSearchOpen ? "w-64 opacity-100" : "w-0 opacity-0"
+                    }`}
+                  >
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search..."
+                      className="bg-white text-gray-800 rounded-full px-4 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-white/50"
+                      autoFocus={isDesktopSearchOpen}
+                    />
+                  </div>
+                  <button
+                    type={isDesktopSearchOpen ? "submit" : "button"}
+                    onClick={() =>
+                      !isDesktopSearchOpen && setIsDesktopSearchOpen(true)
+                    }
+                    className={`flex items-center justify-center transition-all duration-300 ${
+                      isDesktopSearchOpen ? "ml-2" : "ml-0"
+                    }`}
+                  >
                     <svg
-                      className="w-6 h-6 text-gray-400"
+                      className="w-6 h-6 text-white hover:text-gray-200 transition-colors"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -263,11 +329,10 @@ function Navbar() {
                         strokeLinejoin="round"
                         strokeWidth={2}
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        color="#EE4339"
                       />
                     </svg>
                   </button>
-                </div>
+                </form>
               </div>
             </div>
           </div>
@@ -275,16 +340,36 @@ function Navbar() {
           {/* Mobile Search Overlay */}
           {isSearchOpen && (
             <div className="md:hidden bg-white border-t border-gray-200 px-4 py-3">
-              <div className="relative">
+              <form onSubmit={handleMobileSearch} className="relative">
                 <input
                   type="text"
+                  value={mobileSearchQuery}
+                  onChange={(e) => setMobileSearchQuery(e.target.value)}
                   placeholder="Search and hit enter..."
                   className="w-full text-gray-800 border-b-2 border-[#EE4339] px-2 py-2 text-sm focus:outline-none"
                   autoFocus
                 />
-                <div className="text-[#EE4339] text-xs mt-2">
-                  Masukkan Kata Kunci atau ESC Untuk Keluar
-                </div>
+                <button
+                  type="submit"
+                  className="absolute right-0 top-1/2 -translate-y-1/2"
+                >
+                  <svg
+                    className="w-6 h-6 text-[#EE4339]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </form>
+              <div className="text-[#EE4339] text-xs mt-2">
+                Masukkan Kata Kunci atau ESC Untuk Keluar
               </div>
             </div>
           )}

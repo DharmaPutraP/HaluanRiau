@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Tag from "../components/Tag";
-import { fetchArticleById, fetchHeadlines } from "../services/api";
+import { fetchArticleById, fetchByCategory } from "../services/api";
 
 function ArticleDetailPage() {
   const { id } = useParams();
@@ -9,6 +9,7 @@ function ArticleDetailPage() {
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [article, setArticle] = useState(null);
   const [relatedArticles, setRelatedArticles] = useState([]);
+  const [bacaJugaArticles, setBacaJugaArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,14 +17,31 @@ function ArticleDetailPage() {
       setLoading(true);
       try {
         const articleData = await fetchArticleById(id);
+        console.log("✅ Article loaded:", articleData);
         if (articleData) {
           setArticle(articleData);
-          // Fetch related articles
-          const headlines = await fetchHeadlines();
-          setRelatedArticles(headlines.slice(0, 3));
+          console.log("✅ Article state set");
+          // Try to fetch related articles from same category
+          try {
+            // Convert tag to lowercase for API endpoint
+            const categorySlug = articleData.tag.toLowerCase();
+            const categoryArticles = await fetchByCategory(categorySlug, 1, 6);
+            // Filter out current article
+            const filtered = categoryArticles.filter(
+              (a) => a.id !== articleData.id
+            );
+            setRelatedArticles(filtered.slice(0, 3));
+            setBacaJugaArticles(filtered.slice(0, 1));
+          } catch (headlineError) {
+            console.warn("Could not load related articles:", headlineError);
+            setRelatedArticles([]);
+            setBacaJugaArticles([]);
+          }
+        } else {
+          console.error("❌ No article data returned");
         }
       } catch (error) {
-        console.error("Error loading article:", error);
+        console.error("❌ Error loading article:", error);
       } finally {
         setLoading(false);
       }
@@ -97,12 +115,12 @@ function ArticleDetailPage() {
 
         {/* Article Title */}
         <h1 className="text-2xl md:text-4xl font-bold mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2">
-          {article.judul}
+          {article.judul_berita}
         </h1>
 
         {/* Article Meta Info */}
-        <div className="flex justify-between border-b border-gray-200">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 mb-6 pb-4">
+        <div className="border-b border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 pb-4">
             <div className="flex items-center gap-2">
               <svg
                 className="w-4 h-4 text-gray-500"
@@ -135,7 +153,8 @@ function ArticleDetailPage() {
                 />
               </svg>
               <span>
-                <span className="font-semibold">Reporter:</span> Ahmad Fauzi
+                <span className="font-semibold">Reporter:</span>{" "}
+                {article.reporter || "Redaksi"}
               </span>
             </div>
             <span className="hidden md:inline">|</span>
@@ -154,7 +173,8 @@ function ArticleDetailPage() {
                 />
               </svg>
               <span>
-                <span className="font-semibold">Editor:</span> Siti Aminah
+                <span className="font-semibold">Penulis:</span>{" "}
+                {article.penulis}
               </span>
             </div>
           </div>
@@ -310,48 +330,174 @@ function ArticleDetailPage() {
           )}
         </div>
 
-        {/* Article Content */}
-        <div
-          className="prose max-w-none text-justify"
-          dangerouslySetInnerHTML={{ __html: article.isi }}
-        ></div>
+        {/* Article Content with Baca Juga in the middle */}
+        <ArticleContentWithBacaJuga
+          content={article.isi}
+          bacaJugaArticles={bacaJugaArticles}
+          onNavigate={(articleId, articleUrl) => {
+            navigate(`/article/${articleId}/${articleUrl || articleId}`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
 
         {/* Tags Section */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-gray-700">Tags:</span>
             <Tag judul={article.tag} className="text-xs" />
-            <Tag judul="Breaking News" className="text-xs" />
-            <Tag judul="Riau" className="text-xs" />
           </div>
         </div>
 
-        {/* Related Articles */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
-          <h3 className="font-bold text-xl mb-4">Berita Terkait</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {relatedArticles.slice(0, 3).map((item) => (
+        {/* Related Articles - Only show if there are articles */}
+        {relatedArticles && relatedArticles.length > 0 && (
+          <div className="mt-8 pt-6 border-t border-gray-300">
+            <h3 className="font-bold text-xl mb-4">Berita Terkait</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {relatedArticles.slice(0, 3).map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    navigate(`/article/${item.id}/${item.url || item.id}`)
+                  }
+                  className="cursor-pointer hover:shadow-lg transition"
+                >
+                  <img
+                    src={item.gambar}
+                    alt={item.judul}
+                    className="w-full h-40 object-cover rounded"
+                    onError={(e) => {
+                      e.target.src = "/image.png";
+                    }}
+                  />
+                  <h4 className="font-bold mt-2 line-clamp-2">{item.judul}</h4>
+                  <p className="text-sm text-gray-500 mt-1">{item.tanggal}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Component to render article content with Baca Juga section in the middle
+function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
+  // Split content roughly in half based on paragraphs
+  const { firstHalf, secondHalf } = useMemo(() => {
+    if (!content) return { firstHalf: "", secondHalf: "" };
+
+    try {
+      // Split by paragraphs (p tags)
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
+      const paragraphs = Array.from(
+        doc.querySelectorAll(
+          "p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, img"
+        )
+      );
+
+      // Find middle point
+      const midPoint = Math.floor(paragraphs.length / 2);
+
+      if (paragraphs.length < 3) {
+        // If too short, don't split
+        return { firstHalf: content, secondHalf: "" };
+      }
+
+      // Split paragraphs
+      const firstParagraphs = paragraphs.slice(0, midPoint);
+      const secondParagraphs = paragraphs.slice(midPoint);
+
+      const firstHalf = firstParagraphs.map((p) => p.outerHTML).join("");
+      const secondHalf = secondParagraphs.map((p) => p.outerHTML).join("");
+
+      return { firstHalf, secondHalf };
+    } catch (error) {
+      console.error("Error splitting content:", error);
+      // If parsing fails, return the full content without splitting
+      return { firstHalf: content, secondHalf: "" };
+    }
+  }, [content]);
+
+  return (
+    <>
+      {/* First half of content */}
+      <div
+        className="prose max-w-none text-justify"
+        dangerouslySetInnerHTML={{ __html: firstHalf }}
+      ></div>
+
+      {/* Baca Juga Section in the middle */}
+      {bacaJugaArticles && bacaJugaArticles.length > 0 && (
+        <div className="my-8 bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-[#EE4339] rounded-lg p-6 shadow-md">
+          <div className="flex items-center gap-2 mb-4">
+            <svg
+              className="w-6 h-6 text-[#EE4339]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+            <h3 className="text-xl font-bold text-gray-800">Baca Juga</h3>
+          </div>
+
+          <div className="space-y-4">
+            {bacaJugaArticles.map((article, index) => (
               <div
-                key={item.id}
-                onClick={() => navigate(`/article/${item.id}`)}
-                className="cursor-pointer hover:shadow-lg transition"
+                key={article.id}
+                onClick={() => onNavigate(article.id, article.url)}
+                className="flex gap-4 bg-white rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
               >
-                <img
-                  src={item.gambar}
-                  alt={item.judul}
-                  className="w-full h-40 object-cover rounded"
-                  onError={(e) => {
-                    e.target.src = "/image.png";
-                  }}
-                />
-                <h4 className="font-bold mt-2 line-clamp-2">{item.judul}</h4>
-                <p className="text-sm text-gray-500 mt-1">{item.tanggal}</p>
+                {/* Article Image */}
+                <div className="shrink-0">
+                  <img
+                    src={article.gambar}
+                    alt={article.judul}
+                    className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg group-hover:opacity-90 transition"
+                    onError={(e) => {
+                      e.target.src = "/image.png";
+                    }}
+                  />
+                </div>
+
+                {/* Article Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-semibold text-white bg-[#EE4339] px-2 py-1 rounded">
+                      {article.tag}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {article.tanggal}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-gray-800 line-clamp-2 group-hover:text-[#EE4339] transition">
+                    {article.judul}
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-2 line-clamp-2 hidden md:block">
+                    {article.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* Second half of content */}
+      {secondHalf && (
+        <div
+          className="prose max-w-none text-justify"
+          dangerouslySetInnerHTML={{ __html: secondHalf }}
+        ></div>
+      )}
+    </>
   );
 }
 

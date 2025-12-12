@@ -91,21 +91,6 @@ function Video() {
           {/* Title */}
           <div className="flex gap-1 border-b-3 w-fit border-[#EE4339] mb-3 justify-center mx-auto items-center">
             <div className="font-bold text-xl">VIDEO</div>
-            <a
-              href="/videos"
-              className="cursor-pointer hover:opacity-70 transition-opacity"
-            >
-              <svg
-                width="800px"
-                height="800px"
-                viewBox="0 0 16 16"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="#000000"
-                className="w-5 h-5"
-              >
-                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-              </svg>
-            </a>
           </div>
           <div
             ref={scrollContainerRef}
@@ -119,7 +104,7 @@ function Video() {
                 href={video.tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 w-[160px] sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
+                className="shrink-0 w-40 sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
               >
                 <iframe
                   src={video.embedUrl}
@@ -133,7 +118,7 @@ function Video() {
             {/* See More Link */}
             <a
               href="/videos"
-              className="shrink-0 w-[160px] sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-linear-to-br from-[#EE4339] to-[#d63330] rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
+              className="shrink-0 w-40 sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-linear-to-br from-[#EE4339] to-[#d63330] rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
             >
               <svg
                 className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-3 md:mb-4"

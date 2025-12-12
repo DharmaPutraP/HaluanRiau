@@ -34,16 +34,17 @@ function BeritaTerkiniComponent({ data = [] }) {
   return (
     <div className="">
       {data.map((item, index) => (
-        <div
+        <a
           key={index}
-          className="pb-4 flex flex-col md:flex-row justify-around gap-3 md:gap-5 mb-3 border-b-2 border-gray-300"
+          href={`/article/${item.id}/${item.url}`}
+          className="pb-4 flex flex-col md:flex-row justify-around gap-3 md:gap-5 mb-3 border-b-2 border-gray-300 hover:opacity-80 transition-opacity cursor-pointer"
         >
           {/* Image first on mobile, right side on desktop */}
           <div className="w-full md:w-3/12 md:order-2">
             <img
-              src={`${item.image}.png`}
+              src={item.image}
               alt={item.judul}
-              className="w-full h-auto object-cover rounded"
+              className="w-full h-32 md:h-30 object-cover rounded"
             />
           </div>
 
@@ -60,7 +61,7 @@ function BeritaTerkiniComponent({ data = [] }) {
               <p>{item.lastUpdated}</p>
             </div>
           </div>
-        </div>
+        </a>
       ))}
       <div className="flex justify-center">
         <Button

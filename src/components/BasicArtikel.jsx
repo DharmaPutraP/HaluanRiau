@@ -4,19 +4,24 @@ function BasicArtikel({
   title,
   date,
   className = "",
+  id,
+  url,
 }) {
   return (
-    <div className={`${className}`}>
+    <a
+      href={`/article/${id}/${url || id}`}
+      className={`${className} block hover:opacity-80 transition-opacity cursor-pointer`}
+    >
       {image && (
         <img
-          src={`${imageUrl}.png`}
+          src={imageUrl}
           alt={title}
-          className="w-11/12 h-auto mb-3"
+          className="w-full h-32 object-cover rounded mb-3"
         />
       )}
       <h2 className="text-sm font-bold mb-1">{title}</h2>
       <p className="text-xs text-gray-500">{date}</p>
-    </div>
+    </a>
   );
 }
 

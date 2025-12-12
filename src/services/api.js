@@ -5,14 +5,15 @@ const formatArticleData = (apiData) => {
   return apiData.map((item) => ({
     id: item.id_berita,
     judul: item.judul_berita,
+    judul_berita: item.judul_berita, // Keep original for article detail page
     tag: getCategoryName(item.id_kategori),
     tanggal: formatDate(item.tanggal, item.waktu),
     lastUpdated: formatLastUpdated(item.updated_at),
     description: stripHtml(item.isi).substring(0, 200) + "...",
-    gambar: item.gambar ? `${API_URL}/uploads/${item.gambar}` : "/image.png",
-    image: item.gambar ? `${API_URL}/uploads/${item.gambar}` : "/image.png",
+    gambar: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
+    image: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
     foto_kecil: item.foto_kecil
-      ? `${API_URL}/uploads/${item.foto_kecil}`
+      ? `/foto/berita/original/${item.foto_kecil}`
       : "/image.png",
     ket_foto: item.ket_foto || "",
     reporter: item.reporter || "Redaksi",
@@ -21,6 +22,7 @@ const formatArticleData = (apiData) => {
     timesRead: item.counter || 0,
     url: item.url,
     isi: item.isi,
+    rawGambar: item.gambar, // For debugging
   }));
 };
 
@@ -80,36 +82,48 @@ const getCategoryName = (id) => {
   return categories[id] || "Berita";
 };
 
-// Fetch functions for each endpoint
-export const fetchHeadlines = async () => {
+// Generic function to fetch by category with pagination
+const fetchByKategori = async (kategori, page = 1) => {
   try {
-    const response = await fetch(`${API_URL}/headline`);
-    if (!response.ok) throw new Error("Failed to fetch headlines");
+    const response = await fetch(
+      `${API_URL}/kategori/${kategori}?halaman=${page}`
+    );
+    if (!response.ok) throw new Error(`Failed to fetch ${kategori}`);
     const data = await response.json();
+    console.log(`📂 ${kategori} page ${page} - Got`, data?.length, "articles");
     return formatArticleData(data);
   } catch (error) {
-    console.error("Error fetching headlines:", error);
+    console.error(`Error fetching ${kategori}:`, error);
     return [];
   }
 };
 
-export const fetchPilihanEditor = async () => {
-  try {
-    const response = await fetch(`${API_URL}/pilihaneditor`);
-    if (!response.ok) throw new Error("Failed to fetch pilihan editor");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching pilihan editor:", error);
-    return [];
-  }
-};
+// Fetch functions for each endpoint - with default pagination
+export const fetchHeadlines = (page = 1) => fetchByKategori("headline", page);
+export const fetchPilihanEditor = (page = 1) =>
+  fetchByKategori("pilihaneditor", page);
+export const fetchTerpopuler = (page = 1) =>
+  fetchByKategori("terpopuler", page);
+export const fetchGagasan = (page = 1) => fetchByKategori("gagasan", page);
+export const fetchRiau = (page = 1) => fetchByKategori("riau", page);
+export const fetchNasional = (page = 1) => fetchByKategori("nasional", page);
+export const fetchTipsKesehatan = (page = 1) =>
+  fetchByKategori("tipskesehatan", page);
+export const fetchAdvertorial = (page = 1) =>
+  fetchByKategori("advertorial", page);
+export const fetchGaleri = (page = 1) => fetchByKategori("galeri", page);
 
-export const fetchBeritaTerkini = async () => {
+// Berita Terkini uses a different endpoint with pagination
+export const fetchBeritaTerkini = async (page = 1) => {
   try {
-    const response = await fetch(`${API_URL}/berita-terkini`);
+    const response = await fetch(`${API_URL}/terkiniglobal?halaman=${page}`);
     if (!response.ok) throw new Error("Failed to fetch berita terkini");
     const data = await response.json();
+    console.log(
+      `🔥 Berita Terkini page ${page} - Got`,
+      data?.length,
+      "articles"
+    );
     return formatArticleData(data);
   } catch (error) {
     console.error("Error fetching berita terkini:", error);
@@ -117,121 +131,95 @@ export const fetchBeritaTerkini = async () => {
   }
 };
 
-export const fetchTerpopuler = async () => {
-  try {
-    const response = await fetch(`${API_URL}/terpopuler`);
-    if (!response.ok) throw new Error("Failed to fetch terpopuler");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching terpopuler:", error);
-    return [];
-  }
-};
-
-export const fetchGagasan = async () => {
-  try {
-    const response = await fetch(`${API_URL}/gagasan`);
-    if (!response.ok) throw new Error("Failed to fetch gagasan");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching gagasan:", error);
-    return [];
-  }
-};
-
-export const fetchRiau = async () => {
-  try {
-    const response = await fetch(`${API_URL}/riau`);
-    if (!response.ok) throw new Error("Failed to fetch riau");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching riau:", error);
-    return [];
-  }
-};
-
-export const fetchNasional = async () => {
-  try {
-    const response = await fetch(`${API_URL}/nasional`);
-    if (!response.ok) throw new Error("Failed to fetch nasional");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching nasional:", error);
-    return [];
-  }
-};
-
-export const fetchTipsKesehatan = async () => {
-  try {
-    const response = await fetch(`${API_URL}/tips-kesehatan`);
-    if (!response.ok) throw new Error("Failed to fetch tips kesehatan");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching tips kesehatan:", error);
-    return [];
-  }
-};
-
-export const fetchAdvertorial = async () => {
-  try {
-    const response = await fetch(`${API_URL}/advertorial`);
-    if (!response.ok) throw new Error("Failed to fetch advertorial");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching advertorial:", error);
-    return [];
-  }
-};
-
-export const fetchGaleri = async () => {
-  try {
-    const response = await fetch(`${API_URL}/galeri`);
-    if (!response.ok) throw new Error("Failed to fetch galeri");
-    const data = await response.json();
-    return formatArticleData(data);
-  } catch (error) {
-    console.error("Error fetching galeri:", error);
-    return [];
-  }
-};
-
 export const fetchArticleById = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/berita/${id}`);
-    if (!response.ok) throw new Error("Failed to fetch article");
+    console.log(`🔍 Fetching article with ID: ${id}`);
+    console.log(`📡 URL: ${API_URL}/${id}`);
+
+    const response = await fetch(`${API_URL}/${id}`);
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      console.error(
+        "❌ Response not OK:",
+        response.status,
+        response.statusText
+      );
+      throw new Error("Failed to fetch article");
+    }
+
     const data = await response.json();
-    return formatArticleData([data])[0];
+    console.log("📦 Raw response data:", data);
+    console.log("Is array:", Array.isArray(data));
+    console.log("Data type:", typeof data);
+
+    // Handle both single object and array responses
+    const articleData = Array.isArray(data) ? data[0] : data;
+    console.log("Article data to format:", articleData);
+
+    if (!articleData) {
+      console.error("❌ No article data found");
+      return null;
+    }
+
+    const formatted = formatArticleData([articleData])[0];
+    console.log("✅ Formatted article:", formatted);
+
+    return formatted;
   } catch (error) {
-    console.error("Error fetching article:", error);
+    console.error("❌ Error fetching article:", error);
     return null;
   }
 };
 
 export const fetchArticleByUrl = async (url) => {
   try {
-    const response = await fetch(`${API_URL}/berita/url/${url}`);
-    if (!response.ok) throw new Error("Failed to fetch article");
+    console.log(`🔍 Fetching article with URL: ${url}`);
+    console.log(`📡 URL: ${API_URL}/${url}`);
+
+    const response = await fetch(`${API_URL}/${url}`);
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      console.error(
+        "❌ Response not OK:",
+        response.status,
+        response.statusText
+      );
+      throw new Error("Failed to fetch article");
+    }
+
     const data = await response.json();
-    return formatArticleData([data])[0];
+    console.log("📦 Raw response data:", data);
+    console.log("Is array:", Array.isArray(data));
+    console.log("Data type:", typeof data);
+
+    // Handle both single object and array responses
+    const articleData = Array.isArray(data) ? data[0] : data;
+    console.log("Article data to format:", articleData);
+
+    if (!articleData) {
+      console.error("❌ No article data found");
+      return null;
+    }
+
+    const formatted = formatArticleData([articleData])[0];
+    console.log("✅ Formatted article:", formatted);
+
+    return formatted;
   } catch (error) {
-    console.error("Error fetching article:", error);
+    console.error("❌ Error fetching article:", error);
     return null;
   }
 };
 
-// Generic fetch function for category pages
-export const fetchByCategory = async (category) => {
+// Generic fetch function for category pages with pagination
+export const fetchByCategory = async (category, page = 1) => {
   const endpointMap = {
     headline: fetchHeadlines,
     "pilihan-editor": fetchPilihanEditor,
     "berita-terkini": fetchBeritaTerkini,
-    "indeks-berita": fetchHeadlines,
+    "indeks-berita": fetchBeritaTerkini,
     terpopuler: fetchTerpopuler,
     gagasan: fetchGagasan,
     riau: fetchRiau,
@@ -243,17 +231,36 @@ export const fetchByCategory = async (category) => {
 
   const fetchFunction = endpointMap[category];
   if (fetchFunction) {
-    return await fetchFunction();
+    return await fetchFunction(page);
   }
 
-  // If not in map, try generic category endpoint
   try {
-    const response = await fetch(`${API_URL}/${category}`);
+    const response = await fetch(
+      `${API_URL}/kategori/${category}?halaman=${page}`
+    );
     if (!response.ok) throw new Error(`Failed to fetch ${category}`);
     const data = await response.json();
+    console.log(`📂 ${category} page ${page} - Got`, data?.length, "articles");
     return formatArticleData(data);
   } catch (error) {
     console.error(`Error fetching ${category}:`, error);
+    return [];
+  }
+};
+
+export const fetchSearchResults = async (query) => {
+  try {
+    console.log(`🔍 Searching for: ${query}`);
+    const response = await fetch(
+      `${API_URL}/search/${encodeURIComponent(query)}`
+    );
+    console.log(`${API_URL}/search/${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error("Failed to fetch search results");
+    const data = await response.json();
+    console.log(`📦 Search results:`, data?.length, "articles");
+    return formatArticleData(data);
+  } catch (error) {
+    console.error("Error fetching search results:", error);
     return [];
   }
 };

@@ -30,7 +30,7 @@ function Riau({ data = [] }) {
           <div
             key={index}
             className={`${
-              index !== 0 ? "ps-8 border-l border-gray-300" : ""
+              index !== 0 ? "ms-4 ps-4 border-l border-gray-300" : ""
             } w-full`}
           >
             <BasicArtikel
@@ -38,6 +38,8 @@ function Riau({ data = [] }) {
               image={true}
               imageUrl={item.gambar}
               date={item.tanggal}
+              id={item.id}
+              url={item.url}
             />
           </div>
         ))}
@@ -55,6 +57,8 @@ function Riau({ data = [] }) {
               image={true}
               imageUrl={item.gambar}
               date={item.tanggal}
+              id={item.id}
+              url={item.url}
             />
           </div>
         ))}

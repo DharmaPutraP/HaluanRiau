@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -29,7 +29,22 @@ class ErrorBoundary extends Component {
 }
 
 function ErrorFallback({ error }) {
-  const navigate = useNavigate();
+  // Try to use navigate, but handle case where Router context is not available
+  let navigate = null;
+  try {
+    navigate = useNavigate();
+  } catch (e) {
+    console.warn("Router context not available in ErrorBoundary");
+  }
+
+  const handleGoHome = () => {
+    if (navigate) {
+      navigate("/");
+    } else {
+      // Fallback to regular navigation
+      window.location.href = "/";
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -78,7 +93,7 @@ function ErrorFallback({ error }) {
             Muat Ulang Halaman
           </button>
           <button
-            onClick={() => navigate("/")}
+            onClick={handleGoHome}
             className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
           >
             Kembali ke Beranda

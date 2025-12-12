@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Headline from "../components/Layout/Headline";
 import PilihanEditor from "../components/Layout/PilihanEditor";
 import BeritaTerkini from "../components/Layout/BeritaTerkini";
@@ -20,6 +20,9 @@ import {
   fetchGaleri,
 } from "../services/api";
 
+// Cache duration: 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
+
 function HomePage() {
   const [headlines, setHeadlines] = useState([]);
   const [pilihanEditor, setPilihanEditor] = useState([]);
@@ -32,48 +35,73 @@ function HomePage() {
   const [advertorial, setAdvertorial] = useState([]);
   const [galeri, setGaleri] = useState([]);
   const [loading, setLoading] = useState(true);
+  const lastFetchTime = useRef(null);
 
   useEffect(() => {
     const loadData = async () => {
+      // Check if we have cached data that's still fresh
+      const now = Date.now();
+      if (
+        lastFetchTime.current &&
+        now - lastFetchTime.current < CACHE_DURATION
+      ) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        const [
-          headlinesData,
-          pilihanEditorData,
-          beritaTerkiniData,
-          terpopulerData,
-          gagasanData,
-          riauData,
-          nasionalData,
-          tipsKesehatanData,
-          advertorialData,
-          galeriData,
-        ] = await Promise.all([
-          fetchHeadlines(),
-          fetchPilihanEditor(),
-          fetchBeritaTerkini(),
-          fetchTerpopuler(),
-          fetchGagasan(),
-          fetchRiau(),
-          fetchNasional(),
-          fetchTipsKesehatan(),
-          fetchAdvertorial(),
-          fetchGaleri(),
-        ]);
+        // Load data sequentially with small delays to prevent overwhelming the server
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+        // Load critical content first
+        const headlinesData = await fetchHeadlines();
         setHeadlines(headlinesData);
+        await delay(100);
+
+        const pilihanEditorData = await fetchPilihanEditor();
         setPilihanEditor(pilihanEditorData);
+        await delay(100);
+
+        const beritaTerkiniData = await fetchBeritaTerkini();
         setBeritaTerkini(beritaTerkiniData);
+        await delay(100);
+
+        const terpopulerData = await fetchTerpopuler();
         setTerpopuler(terpopulerData);
+
+        // Load remaining sections in background (non-blocking)
+        setLoading(false);
+
+        // Continue loading other sections
+        await delay(200);
+        const gagasanData = await fetchGagasan();
         setGagasan(gagasanData);
+
+        await delay(200);
+        const riauData = await fetchRiau();
         setRiau(riauData);
+
+        await delay(200);
+        const nasionalData = await fetchNasional();
         setNasional(nasionalData);
+
+        await delay(200);
+        const tipsKesehatanData = await fetchTipsKesehatan();
         setTipsKesehatan(tipsKesehatanData);
+
+        await delay(200);
+        const advertorialData = await fetchAdvertorial();
         setAdvertorial(advertorialData);
+
+        await delay(200);
+        const galeriData = await fetchGaleri();
         setGaleri(galeriData);
+
+        // Update last fetch time
+        lastFetchTime.current = Date.now();
       } catch (error) {
         console.error("Error loading data:", error);
-      } finally {
         setLoading(false);
       }
     };

@@ -24,11 +24,12 @@ function Terpopuler({ data = [] }) {
           </a>
         </div>
         {topFive.map((item, index) => (
-          <div
+          <a
             key={index}
-            className={`${
+            href={`/article/${item.id}/${item.url || item.id}`}
+            className={`block ${
               index === 0 ? "" : "pt-2"
-            } border-b-2 pb-1 border-gray-200`}
+            } border-b-2 pb-1 border-gray-200 hover:opacity-80 transition-opacity cursor-pointer`}
           >
             <Tag judul={item.tag} className="text-xs mb-2" />
             <p className="text-md mt-1 leading-4 font-bold">{item.judul}</p>
@@ -37,7 +38,7 @@ function Terpopuler({ data = [] }) {
               <p className="text-gray-500">Dibaca {item.timesRead} kali</p>
             </div>
             <p className="text-xs mt-2 mb-2">{item.description}</p>
-          </div>
+          </a>
         ))}
       </div>
     </>

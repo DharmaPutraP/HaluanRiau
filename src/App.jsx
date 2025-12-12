@@ -4,6 +4,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
 import CategoryPage from "./pages/CategoryPage";
+import SearchPage from "./pages/SearchPage";
 import VideoListPage from "./pages/VideoListPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -14,8 +15,9 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="article/:id" element={<ArticleDetailPage />} />
+            <Route path="article/:id/:url" element={<ArticleDetailPage />} />
             <Route path="category/:category" element={<CategoryPage />} />
+            <Route path="search/:query" element={<SearchPage />} />
             <Route path="videos" element={<VideoListPage />} />
             {/* 404 - Not Found */}
             <Route path="*" element={<NotFoundPage />} />
