@@ -7,19 +7,14 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://192.168.1.47:81",
+        target: "http://192.168.1.20:81",
         changeOrigin: true,
         rewrite: (path) => {
-          // Handle search separately
-          if (path.startsWith("/api/search/")) {
-            return path.replace(/^\/api/, "");
-          }
-          // Default: rewrite /api to /berita
-          return path.replace(/^\/api/, "/berita");
+          return path.replace(/^\/api/, "");
         },
       },
       "/foto": {
-        target: "http://192.168.1.47:81",
+        target: "http://192.168.1.20:81",
         changeOrigin: true,
         rewrite: (path) => path,
       },

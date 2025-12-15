@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  /* Custom Colors - Tambahkan warna custom Anda di sini */
+  --color-primary: #383bcf;
+
+  --color-secondary: #ff2929;
+
+  /* Warna teks */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+}
+
 body {
   font-family: "Inria Serif", "Inter", serif;
   background-color: #f2f2f2;

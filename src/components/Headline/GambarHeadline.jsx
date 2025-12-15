@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Tag from "../Tag";
 
 function GambarHeadline({ data = [] }) {
@@ -24,8 +25,9 @@ function GambarHeadline({ data = [] }) {
 
   return (
     <div className="flex-initial md:border-x md:px-5 relative w-full md:w-7/12">
-      <div
-        className="relative overflow-hidden group cursor-pointer"
+      <Link
+        to={`/article/${currentItem.id}/${currentItem.url}`}
+        className="relative overflow-hidden group cursor-pointer block"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -34,10 +36,10 @@ function GambarHeadline({ data = [] }) {
           {data.map((item, index) => (
             <img
               key={index}
-              src="/image.png"
+              src={item.image}
               alt={item.judul}
               className={`w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-700 ease-in-out ${
-                currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-10"
               }`}
             />
           ))}
@@ -82,8 +84,7 @@ function GambarHeadline({ data = [] }) {
           </p>
 
           {/* Read more link */}
-          <a
-            href="#"
+          <div
             className={`flex items-center text-md font-semibold mt-3 transition-all duration-300 ${
               isHovered ? "opacity-100" : "opacity-0"
             }`}
@@ -92,9 +93,9 @@ function GambarHeadline({ data = [] }) {
             <svg className="w-6 h-6 " fill="currentColor" viewBox="0 0 24 24">
               <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z" />
             </svg>
-          </a>
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

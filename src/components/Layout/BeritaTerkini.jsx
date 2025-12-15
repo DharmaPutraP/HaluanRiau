@@ -5,7 +5,7 @@ function BeritaTerkini({ data = [] }) {
   const headlines = data.slice(0, 10);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
-      <div className="flex gap-2 border-b-3 w-fit border-[#EE4339] mb-3 items-center">
+      <div className="flex gap-2 border-b-3 w-fit border-primary mb-3 items-center">
         <div className="font-bold">BERITA TERKINI</div>
         <a
           href="/category/indeks-berita"

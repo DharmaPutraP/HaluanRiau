@@ -6,7 +6,7 @@ function Riau({ data = [] }) {
   const topSix = data.slice(0, 6);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
-      <div className="border-b-3 w-fit border-[#EE4339] mb-3 items-center mx-auto flex gap-2">
+      <div className="border-b-3 w-fit border-primary mb-3 items-center mx-auto flex gap-2">
         <div className="font-bold text-center">RIAU</div>
         <a
           href="/category/riau"

@@ -17,8 +17,8 @@ function MixLayout({ title, data = [] }) {
 
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
-      <div className="flex border-b-3 w-7/13 border-[#EE4339] mb-3 items-center justify-center mx-auto">
-        <div className="font-bold text-center">{title}</div>
+      <div className="flex border-b-3 border-primary mb-3 items-center justify-center mx-auto w-fit">
+        <div className="font-bold text-center w-fit">{title}</div>
         <a
           href={getUrl(title)}
           className="cursor-pointer hover:opacity-70 transition-opacity"

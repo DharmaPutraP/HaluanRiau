@@ -92,7 +92,7 @@ function VideoListPage() {
           <div className="flex justify-center mt-6 md:mt-8">
             <button
               onClick={handleLoadMore}
-              className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-[#EE4339] text-white rounded-lg hover:bg-[#d63330] transition font-semibold"
+              className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-primary text-white rounded-lg hover:bg-[#d63330] transition font-semibold"
             >
               Muat Lebih Banyak Video
             </button>

@@ -5,7 +5,7 @@ function Terpopuler({ data = [] }) {
   return (
     <>
       <div className="bg-white mt-2 px-5 pt-2 pb-5 h-fit">
-        <div className="flex gap-2 border-b-3 w-fit border-[#EE4339] mb-3 items-center">
+        <div className="flex gap-2 border-b-3 w-fit border-primary mb-3 items-center">
           <div className="font-bold">TERPOPULER</div>
           <a
             href="/category/terpopuler"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Tag from "../components/Tag";
-import { fetchArticleById, fetchByCategory } from "../services/api";
+import { fetchArticleById, fetchRelatedArticles } from "../services/api";
 
 function ArticleDetailPage() {
   const { id } = useParams();
@@ -21,17 +21,11 @@ function ArticleDetailPage() {
         if (articleData) {
           setArticle(articleData);
           console.log("✅ Article state set");
-          // Try to fetch related articles from same category
+          // Use the new dedicated related articles endpoint
           try {
-            // Convert tag to lowercase for API endpoint
-            const categorySlug = articleData.tag.toLowerCase();
-            const categoryArticles = await fetchByCategory(categorySlug, 1, 6);
-            // Filter out current article
-            const filtered = categoryArticles.filter(
-              (a) => a.id !== articleData.id
-            );
-            setRelatedArticles(filtered.slice(0, 3));
-            setBacaJugaArticles(filtered.slice(0, 1));
+            const related = await fetchRelatedArticles(articleData.id, 5);
+            setRelatedArticles(related.slice(0, 3));
+            setBacaJugaArticles(related.slice(0, 2));
           } catch (headlineError) {
             console.warn("Could not load related articles:", headlineError);
             setRelatedArticles([]);

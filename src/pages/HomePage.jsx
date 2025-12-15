@@ -8,6 +8,12 @@ import Riau from "../components/Layout/Riau";
 import MixLayout from "../components/Layout/MixLayout";
 import Video from "../components/Layout/Video";
 import {
+  HeadlineSkeleton,
+  SectionSkeleton,
+  CardSkeleton,
+  MixLayoutSkeleton,
+} from "../components/LoadingSkeleton";
+import {
   fetchHeadlines,
   fetchPilihanEditor,
   fetchBeritaTerkini,
@@ -49,54 +55,93 @@ function HomePage() {
         return;
       }
 
-      setLoading(true);
       try {
-        // Load data sequentially with small delays to prevent overwhelming the server
+        // Load data sequentially with delays to prevent server crash
         const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        // Load critical content first
-        const headlinesData = await fetchHeadlines();
-        setHeadlines(headlinesData);
-        await delay(100);
+        // Critical content first
+        try {
+          const headlinesData = await fetchHeadlines();
+          setHeadlines(headlinesData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching headlines:", err);
+        }
 
-        const pilihanEditorData = await fetchPilihanEditor();
-        setPilihanEditor(pilihanEditorData);
-        await delay(100);
+        try {
+          const pilihanEditorData = await fetchPilihanEditor();
+          setPilihanEditor(pilihanEditorData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching pilihan editor:", err);
+        }
 
-        const beritaTerkiniData = await fetchBeritaTerkini();
-        setBeritaTerkini(beritaTerkiniData);
-        await delay(100);
+        try {
+          const beritaTerkiniData = await fetchBeritaTerkini();
+          setBeritaTerkini(beritaTerkiniData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching berita terkini:", err);
+        }
 
-        const terpopulerData = await fetchTerpopuler();
-        setTerpopuler(terpopulerData);
-
-        // Load remaining sections in background (non-blocking)
+        // Hide main loading spinner after critical content
         setLoading(false);
 
-        // Continue loading other sections
-        await delay(200);
-        const gagasanData = await fetchGagasan();
-        setGagasan(gagasanData);
+        // Continue loading remaining sections with delays
+        try {
+          const terpopulerData = await fetchTerpopuler();
+          setTerpopuler(terpopulerData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching terpopuler:", err);
+        }
 
-        await delay(200);
-        const riauData = await fetchRiau();
-        setRiau(riauData);
+        try {
+          const gagasanData = await fetchGagasan();
+          setGagasan(gagasanData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching gagasan:", err);
+        }
 
-        await delay(200);
-        const nasionalData = await fetchNasional();
-        setNasional(nasionalData);
+        try {
+          const riauData = await fetchRiau();
+          setRiau(riauData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching riau:", err);
+        }
 
-        await delay(200);
-        const tipsKesehatanData = await fetchTipsKesehatan();
-        setTipsKesehatan(tipsKesehatanData);
+        try {
+          const nasionalData = await fetchNasional();
+          setNasional(nasionalData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching nasional:", err);
+        }
 
-        await delay(200);
-        const advertorialData = await fetchAdvertorial();
-        setAdvertorial(advertorialData);
+        try {
+          const tipsKesehatanData = await fetchTipsKesehatan();
+          setTipsKesehatan(tipsKesehatanData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching tips kesehatan:", err);
+        }
 
-        await delay(200);
-        const galeriData = await fetchGaleri();
-        setGaleri(galeriData);
+        try {
+          const advertorialData = await fetchAdvertorial();
+          setAdvertorial(advertorialData);
+          await delay(300);
+        } catch (err) {
+          console.error("Error fetching advertorial:", err);
+        }
+
+        try {
+          const galeriData = await fetchGaleri();
+          setGaleri(galeriData);
+        } catch (err) {
+          console.error("Error fetching galeri:", err);
+        }
 
         // Update last fetch time
         lastFetchTime.current = Date.now();
@@ -122,34 +167,74 @@ function HomePage() {
 
   return (
     <div className="md:mx-24">
-      <Headline data={headlines} />
-      <PilihanEditor data={pilihanEditor} />
+      {headlines.length > 0 ? (
+        <Headline data={headlines} />
+      ) : (
+        <HeadlineSkeleton />
+      )}
+      {pilihanEditor.length > 0 ? (
+        <PilihanEditor data={pilihanEditor} />
+      ) : (
+        <SectionSkeleton />
+      )}
       <Video />
 
       {/* Desktop: 3-column layout with sticky sidebar */}
       <div className="hidden md:grid grid-cols-3 gap-1">
         <div className="col-span-2">
-          <BeritaTerkini data={beritaTerkini} />
+          {beritaTerkini.length > 0 ? (
+            <BeritaTerkini data={beritaTerkini} />
+          ) : (
+            <SectionSkeleton />
+          )}
         </div>
         <div className="sticky top-24 self-start h-fit">
-          <Terpopuler data={terpopuler} />
-          <Gagasan data={gagasan} />
+          {terpopuler.length > 0 ? (
+            <Terpopuler data={terpopuler} />
+          ) : (
+            <CardSkeleton />
+          )}
+          {gagasan.length > 0 ? <Gagasan data={gagasan} /> : <CardSkeleton />}
         </div>
       </div>
 
       {/* Mobile: Stack all sections */}
       <div className="md:hidden flex flex-col gap-2">
-        <BeritaTerkini data={beritaTerkini} />
-        <Terpopuler data={terpopuler} />
-        <Gagasan data={gagasan} />
+        {beritaTerkini.length > 0 ? (
+          <BeritaTerkini data={beritaTerkini} />
+        ) : (
+          <SectionSkeleton />
+        )}
+        {terpopuler.length > 0 ? (
+          <Terpopuler data={terpopuler} />
+        ) : (
+          <CardSkeleton />
+        )}
+        {gagasan.length > 0 ? <Gagasan data={gagasan} /> : <CardSkeleton />}
       </div>
 
-      <Riau data={riau} />
+      {riau.length > 0 ? <Riau data={riau} /> : <SectionSkeleton />}
       <div className="flex flex-col md:grid md:grid-cols-4 gap-2">
-        <MixLayout title="NASIONAL" data={nasional} />
-        <MixLayout title="TIPS & KESEHATAN" data={tipsKesehatan} />
-        <MixLayout title="ADVETORIAL" data={advertorial} />
-        <MixLayout title="GALERI" data={galeri} />
+        {nasional.length > 0 ? (
+          <MixLayout title="NASIONAL" data={nasional} />
+        ) : (
+          <MixLayoutSkeleton />
+        )}
+        {tipsKesehatan.length > 0 ? (
+          <MixLayout title="TIPS & KESEHATAN" data={tipsKesehatan} />
+        ) : (
+          <MixLayoutSkeleton />
+        )}
+        {advertorial.length > 0 ? (
+          <MixLayout title="ADVETORIAL" data={advertorial} />
+        ) : (
+          <MixLayoutSkeleton />
+        )}
+        {galeri.length > 0 ? (
+          <MixLayout title="GALERI" data={galeri} />
+        ) : (
+          <MixLayoutSkeleton />
+        )}
       </div>
     </div>
   );

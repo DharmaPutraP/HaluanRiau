@@ -25,10 +25,21 @@ function Video() {
     })
     .filter(Boolean);
 
+  // Get number of visible items based on screen width
+  const getVisibleItems = () => {
+    if (typeof window === "undefined") return 5;
+    const width = window.innerWidth;
+    if (width < 640) return 1.5; // Mobile: show 1.5 items
+    if (width < 768) return 2.5; // Tablet: show 2.5 items
+    if (width < 1024) return 3.5; // Small desktop: show 3.5 items
+    return 5; // Large desktop: show 5 items
+  };
+
   const scrollToIndex = (index) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const itemWidth = container.offsetWidth / 5; // 5 items visible
+      const visibleItems = getVisibleItems();
+      const itemWidth = container.offsetWidth / visibleItems;
       container.scrollTo({
         left: itemWidth * index,
         behavior: "smooth",
@@ -44,7 +55,8 @@ function Video() {
   };
 
   const handleNext = () => {
-    if (currentIndex < videos.length - 5) {
+    const visibleItems = getVisibleItems();
+    if (currentIndex < videos.length - Math.floor(visibleItems)) {
       scrollToIndex(currentIndex + 1);
     }
   };
@@ -52,7 +64,8 @@ function Video() {
   const handleScroll = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const itemWidth = container.offsetWidth / 5;
+      const visibleItems = getVisibleItems();
+      const itemWidth = container.offsetWidth / visibleItems;
       const newIndex = Math.round(container.scrollLeft / itemWidth);
       setCurrentIndex(newIndex);
     }
@@ -61,18 +74,18 @@ function Video() {
   return (
     <div className="mt-2 relative scrollbar-hide">
       {/* Video Slider Container */}
-      <div className="relative px-4 md:px-10">
+      <div className="relative px-0 sm:px-4 md:px-10">
         {/* Left Arrow Button */}
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#EE4339] text-white rounded-l-full h-full w-10 flex items-center justify-center shadow-lg transition-all hover:bg-[#d63330] cursor-pointer ${
+          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary text-white rounded-r-lg sm:rounded-l-full h-20 sm:h-32 md:h-full w-8 sm:w-10 flex items-center justify-center shadow-lg transition-all hover:bg-primary-dark cursor-pointer ${
             currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           aria-label="Previous videos"
         >
           <svg
-            className="w-6 h-6 md:w-8 md:h-8"
+            className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -87,15 +100,15 @@ function Video() {
         </button>
 
         {/* Video Grid */}
-        <div className="bg-white py-5">
+        <div className="bg-white py-3 sm:py-5">
           {/* Title */}
-          <div className="flex gap-1 border-b-3 w-fit border-[#EE4339] mb-3 justify-center mx-auto items-center">
-            <div className="font-bold text-xl">VIDEO</div>
+          <div className="flex gap-1 border-b-3 w-fit border-primary mb-3 justify-center mx-auto items-center">
+            <div className="font-bold text-lg sm:text-xl">VIDEO</div>
           </div>
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-2 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-4 md:px-10"
+            className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-2 sm:px-4 md:px-10"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {videos.map((video, index) => (
@@ -104,7 +117,7 @@ function Video() {
                 href={video.tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 w-40 sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
+                className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
               >
                 <iframe
                   src={video.embedUrl}
@@ -118,10 +131,10 @@ function Video() {
             {/* See More Link */}
             <a
               href="/videos"
-              className="shrink-0 w-40 sm:w-[200px] md:w-60 h-[280px] sm:h-[350px] md:h-[420px] bg-linear-to-br from-[#EE4339] to-[#d63330] rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
+              className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-gradient-to-br from-primary to-primary-dark rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
             >
               <svg
-                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-3 md:mb-4"
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 sm:mb-3 md:mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -133,8 +146,12 @@ function Video() {
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
               </svg>
-              <span className="text-xl md:text-2xl font-bold">Lihat Semua</span>
-              <span className="text-sm md:text-base mt-2">Video Lainnya</span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold">
+                Lihat Semua
+              </span>
+              <span className="text-xs sm:text-sm md:text-base mt-1 sm:mt-2">
+                Video Lainnya
+              </span>
             </a>
           </div>
         </div>
@@ -142,16 +159,18 @@ function Video() {
         {/* Right Arrow Button */}
         <button
           onClick={handleNext}
-          disabled={currentIndex >= videos.length - 5}
-          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#EE4339] text-white rounded-r-full h-full w-10 flex items-center justify-center shadow-lg transition-all hover:bg-[#d63330] cursor-pointer ${
-            currentIndex >= videos.length - 5
+          disabled={
+            currentIndex >= videos.length - Math.floor(getVisibleItems())
+          }
+          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary text-white rounded-l-lg sm:rounded-r-full h-20 sm:h-32 md:h-full w-8 sm:w-10 flex items-center justify-center shadow-lg transition-all hover:bg-primary-dark cursor-pointer ${
+            currentIndex >= videos.length - Math.floor(getVisibleItems())
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}
           aria-label="Next videos"
         >
           <svg
-            className="w-6 h-6 md:w-8 md:h-8"
+            className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -83,47 +83,134 @@ const getCategoryName = (id) => {
 };
 
 // Generic function to fetch by category with pagination
-const fetchByKategori = async (kategori, page = 1) => {
+const fetchByKategori = async (kategori, page = 1, limit = 10) => {
   try {
     const response = await fetch(
-      `${API_URL}/kategori/${kategori}?halaman=${page}`
+      `${API_URL}/kategori/${kategori}?halaman=${page}&limit=${limit}`
     );
     if (!response.ok) throw new Error(`Failed to fetch ${kategori}`);
-    const data = await response.json();
+    const responseData = await response.json();
+
+    // Handle new response format with pagination metadata
+    const data = responseData.data || responseData;
+    const pagination = responseData.pagination || null;
+
     console.log(`📂 ${kategori} page ${page} - Got`, data?.length, "articles");
-    return formatArticleData(data);
+    if (pagination) {
+      console.log(
+        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
+      );
+    }
+
+    const formatted = formatArticleData(data);
+
+    // Return both data and pagination info
+    return {
+      articles: formatted,
+      pagination: pagination,
+    };
   } catch (error) {
     console.error(`Error fetching ${kategori}:`, error);
-    return [];
+    return { articles: [], pagination: null };
+  }
+};
+
+// Special function for filters that use /berita endpoint
+const fetchBySpecialFilter = async (
+  filterName,
+  filterValue = 1,
+  page = 1,
+  limit = 10
+) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/berita?halaman=${page}&limit=${limit}&${filterName}=${filterValue}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${filterName}`);
+    }
+
+    const result = await response.json();
+    console.log(
+      `🔥 ${filterName} page ${page} - Got ${result.data?.length || 0} articles`
+    );
+
+    const articles = formatArticleData(result.data || []);
+    const pagination = result.pagination || null;
+
+    return {
+      articles: articles,
+      pagination: pagination,
+    };
+  } catch (error) {
+    console.error(`Error fetching ${filterName}:`, error);
+    return { articles: [], pagination: null };
   }
 };
 
 // Fetch functions for each endpoint - with default pagination
-export const fetchHeadlines = (page = 1) => fetchByKategori("headline", page);
-export const fetchPilihanEditor = (page = 1) =>
-  fetchByKategori("pilihaneditor", page);
-export const fetchTerpopuler = (page = 1) =>
-  fetchByKategori("terpopuler", page);
-export const fetchGagasan = (page = 1) => fetchByKategori("gagasan", page);
-export const fetchRiau = (page = 1) => fetchByKategori("riau", page);
-export const fetchNasional = (page = 1) => fetchByKategori("nasional", page);
-export const fetchTipsKesehatan = (page = 1) =>
-  fetchByKategori("tipskesehatan", page);
-export const fetchAdvertorial = (page = 1) =>
-  fetchByKategori("advertorial", page);
-export const fetchGaleri = (page = 1) => fetchByKategori("galeri", page);
+export const fetchHeadlines = async (page = 1, limit = 10) => {
+  const result = await fetchBySpecialFilter("headline", 1, page, limit);
+  return result.articles; // Return only articles for backward compatibility
+};
+export const fetchPilihanEditor = async (page = 1, limit = 10) => {
+  const result = await fetchBySpecialFilter("pilihaneditor", 1, page, limit);
+  return result.articles;
+};
+export const fetchTerpopuler = async (page = 1, limit = 10) => {
+  const result = await fetchBySpecialFilter("terpopuler", 1, page, limit);
+  return result.articles;
+};
+export const fetchAdvertorial = async (page = 1, limit = 10) => {
+  const result = await fetchBySpecialFilter("advertorial", 1, page, limit);
+  return result.articles;
+};
+export const fetchGagasan = async (page = 1, limit = 10) => {
+  const result = await fetchByKategori("gagasan", page, limit);
+  return result.articles;
+};
+export const fetchRiau = async (page = 1, limit = 10) => {
+  const result = await fetchBySpecialFilter("riau", 1, page, limit);
+  return result.articles;
+};
+export const fetchNasional = async (page = 1, limit = 10) => {
+  const result = await fetchByKategori("nasional", page, limit);
+  return result.articles;
+};
+export const fetchTipsKesehatan = async (page = 1, limit = 10) => {
+  const result = await fetchByKategori("tips&kesehatan", page, limit);
+  return result.articles;
+};
+export const fetchGaleri = async (page = 1, limit = 10) => {
+  const result = await fetchByKategori("galeri", page, limit);
+  return result.articles;
+};
 
 // Berita Terkini uses a different endpoint with pagination
-export const fetchBeritaTerkini = async (page = 1) => {
+export const fetchBeritaTerkini = async (page = 1, limit = 10) => {
   try {
-    const response = await fetch(`${API_URL}/terkiniglobal?halaman=${page}`);
+    const response = await fetch(
+      `${API_URL}/terkiniglobal?halaman=${page}&limit=${limit}`
+    );
     if (!response.ok) throw new Error("Failed to fetch berita terkini");
-    const data = await response.json();
+    const responseData = await response.json();
+
+    // Handle new response format with pagination metadata
+    const data = responseData.data || responseData;
+    const pagination = responseData.pagination || null;
+
     console.log(
       `🔥 Berita Terkini page ${page} - Got`,
       data?.length,
       "articles"
     );
+    if (pagination) {
+      console.log(
+        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
+      );
+    }
+
     return formatArticleData(data);
   } catch (error) {
     console.error("Error fetching berita terkini:", error);
@@ -214,7 +301,7 @@ export const fetchArticleByUrl = async (url) => {
 };
 
 // Generic fetch function for category pages with pagination
-export const fetchByCategory = async (category, page = 1) => {
+export const fetchByCategory = async (category, page = 1, limit = 10) => {
   const endpointMap = {
     headline: fetchHeadlines,
     "pilihan-editor": fetchPilihanEditor,
@@ -231,19 +318,47 @@ export const fetchByCategory = async (category, page = 1) => {
 
   const fetchFunction = endpointMap[category];
   if (fetchFunction) {
-    return await fetchFunction(page);
+    return await fetchFunction(page, limit);
   }
 
   try {
     const response = await fetch(
-      `${API_URL}/kategori/${category}?halaman=${page}`
+      `${API_URL}/kategori/${category}?halaman=${page}&limit=${limit}`
     );
     if (!response.ok) throw new Error(`Failed to fetch ${category}`);
-    const data = await response.json();
+    const responseData = await response.json();
+
+    // Handle new response format with pagination metadata
+    const data = responseData.data || responseData;
+    const pagination = responseData.pagination || null;
+
     console.log(`📂 ${category} page ${page} - Got`, data?.length, "articles");
+    if (pagination) {
+      console.log(
+        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
+      );
+    }
+
     return formatArticleData(data);
   } catch (error) {
     console.error(`Error fetching ${category}:`, error);
+    return [];
+  }
+};
+
+// New function to fetch related articles for "Baca Juga" section
+export const fetchRelatedArticles = async (articleId, limit = 2) => {
+  try {
+    console.log(`🔗 Fetching related articles for ID: ${articleId}`);
+    const response = await fetch(
+      `${API_URL}/artikel/${articleId}/related?limit=${limit}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch related articles");
+    const data = await response.json();
+    console.log(`🔗 Related articles - Got`, data?.length, "articles");
+    return formatArticleData(data);
+  } catch (error) {
+    console.error("Error fetching related articles:", error);
     return [];
   }
 };

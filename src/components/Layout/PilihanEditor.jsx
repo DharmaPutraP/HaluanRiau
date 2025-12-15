@@ -4,9 +4,10 @@ import MenuPilihanEditor from "../MenuPilihanEditor";
 function PilihanEditor({ data = [] }) {
   const topFive = data.slice(0, 5);
   const topSix = data.slice(0, 6);
+  console.log(topSix);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
-      <div className="flex gap-2 border-b-3 w-fit border-[#EE4339] mb-3 items-center">
+      <div className="flex gap-2 border-b-3 w-fit border-primary mb-3 items-center">
         <div className="font-bold">PILIHAN EDITOR</div>
         <a
           href="/category/pilihan-editor"
@@ -37,7 +38,7 @@ function PilihanEditor({ data = [] }) {
               judul={item.judul}
               gambar={item.gambar}
               tanggal={item.tanggal}
-              tag={item.tag}
+              tag={item.nama_kategori}
               id={item.id}
               url={item.url}
             />

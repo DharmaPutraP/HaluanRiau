@@ -99,7 +99,7 @@ function Navbar() {
           </a>
         </div>
 
-        <nav className="bg-white md:bg-[#EE4339] text-white md:px-24">
+        <nav className="bg-white md:bg-primary text-white md:px-24">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-12 md:h-12">
               {/* Mobile: Hamburger Icon */}
@@ -305,7 +305,7 @@ function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search..."
-                      className="bg-white text-gray-800 rounded-full px-4 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-white/50"
+                      className="text-black placeholder-black rounded-full px-4 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-white/50 bg-[#EEC823]"
                       autoFocus={isDesktopSearchOpen}
                     />
                   </div>
@@ -346,7 +346,7 @@ function Navbar() {
                   value={mobileSearchQuery}
                   onChange={(e) => setMobileSearchQuery(e.target.value)}
                   placeholder="Search and hit enter..."
-                  className="w-full text-gray-800 border-b-2 border-[#EE4339] px-2 py-2 text-sm focus:outline-none"
+                  className="w-full text-gray-800 border-b-2 border-[#383BCF] px-2 py-2 text-sm focus:outline-none bg-[#EEC823]"
                   autoFocus
                 />
                 <button
