@@ -2,6 +2,10 @@ import BasicArtikel from "../BasicArtikel";
 function MixLayout({ title, data = [] }) {
   const topFive = data.slice(0, 5);
 
+  // Determine if this is galeri content
+  const isGaleri = title === "GALERI";
+  const contentType = isGaleri ? "galeri" : "article";
+
   // Convert title to URL-friendly format
   const getUrl = (title) => {
     const urlMap = {
@@ -48,6 +52,9 @@ function MixLayout({ title, data = [] }) {
                 image={true}
                 imageUrl={item.gambar}
                 date={item.tanggal}
+                id={item.id}
+                url={item.url}
+                type={contentType}
                 className="mb-2"
               />
             )}
@@ -57,6 +64,9 @@ function MixLayout({ title, data = [] }) {
                 image={false}
                 imageUrl={item.gambar}
                 date={item.tanggal}
+                id={item.id}
+                url={item.url}
+                type={contentType}
                 className="mt-4 mb-2"
               />
             )}

@@ -7,6 +7,7 @@ import Gagasan from "../components/Layout/Gagasan";
 import Riau from "../components/Layout/Riau";
 import MixLayout from "../components/Layout/MixLayout";
 import Video from "../components/Layout/Video";
+import BannerModal from "../components/BannerModal";
 import {
   HeadlineSkeleton,
   SectionSkeleton,
@@ -24,6 +25,7 @@ import {
   fetchTipsKesehatan,
   fetchAdvertorial,
   fetchGaleri,
+  fetchBannersByPosition,
 } from "../services/api";
 
 // Cache duration: 5 minutes
@@ -41,6 +43,8 @@ function HomePage() {
   const [advertorial, setAdvertorial] = useState([]);
   const [galeri, setGaleri] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [banner, setBanner] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const lastFetchTime = useRef(null);
 
   useEffect(() => {
@@ -143,6 +147,15 @@ function HomePage() {
           console.error("Error fetching galeri:", err);
         }
 
+        try {
+          const bannerData = await fetchBannersByPosition("diatas riau");
+          if (bannerData && bannerData.length > 0) {
+            setBanner(bannerData[0]);
+          }
+        } catch (err) {
+          console.error("Error fetching banner:", err);
+        }
+
         // Update last fetch time
         lastFetchTime.current = Date.now();
       } catch (error) {
@@ -213,6 +226,18 @@ function HomePage() {
         {gagasan.length > 0 ? <Gagasan data={gagasan} /> : <CardSkeleton />}
       </div>
 
+      {/* Banner before Riau section */}
+      {banner && (
+        <div className="px-5 md:px-10 py-4 mt-2">
+          <img
+            src={banner.image}
+            alt={banner.judul}
+            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => setIsModalOpen(true)}
+          />
+        </div>
+      )}
+
       {riau.length > 0 ? <Riau data={riau} /> : <SectionSkeleton />}
       <div className="flex flex-col md:grid md:grid-cols-4 gap-2">
         {nasional.length > 0 ? (
@@ -236,6 +261,13 @@ function HomePage() {
           <MixLayoutSkeleton />
         )}
       </div>
+
+      <BannerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        imageUrl={banner?.image}
+        imageAlt={banner?.judul}
+      />
     </div>
   );
 }

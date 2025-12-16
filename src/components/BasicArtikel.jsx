@@ -6,10 +6,13 @@ function BasicArtikel({
   className = "",
   id,
   url,
+  type = "article", // 'article' or 'galeri'
 }) {
+  const baseRoute = type === "galeri" ? "/galeri" : "/article";
+
   return (
     <a
-      href={`/article/${id}/${url || id}`}
+      href={`${baseRoute}/${id}/${url || id}`}
       className={`${className} block hover:opacity-80 transition-opacity cursor-pointer`}
     >
       {image && (

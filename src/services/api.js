@@ -25,6 +25,7 @@ const formatArticleData = (apiData) => {
     timesRead: item.counter || 0,
     url: item.url,
     isi: item.isi,
+    jumlah_dibaca: item.counter || 0,
     rawGambar: item.gambar, // For debugging
   }));
 };
@@ -161,7 +162,7 @@ export const fetchGagasan = async (page = 1, limit = 10) => {
   return result.articles;
 };
 export const fetchRiau = async (page = 1, limit = 10) => {
-  const result = await fetchBySpecialFilter("riau", 1, page, limit);
+  const result = await fetchBySpecialFilter("Riau", 1, page, limit);
   return result.articles;
 };
 export const fetchNasional = async (page = 1, limit = 10) => {
@@ -173,8 +174,33 @@ export const fetchTipsKesehatan = async (page = 1, limit = 10) => {
   return result.articles;
 };
 export const fetchGaleri = async (page = 1, limit = 10) => {
-  const result = await fetchByKategori("galeri", page, limit);
-  return result.articles;
+  try {
+    const response = await fetch(`${API_URL}/albumgaleri`);
+    if (!response.ok) throw new Error("Failed to fetch galeri");
+    const data = await response.json();
+
+    // Format album galeri data
+    const formattedData = data.map((item) => ({
+      id: item.id_album,
+      judul: item.nama_album,
+      judul_berita: item.nama_album,
+      tag: "Galeri",
+      tanggal: formatDate(item.tanggal_album, item.waktu || "00:00:00"),
+      description: item.keterangan || "",
+      gambar: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
+      image: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
+      foto_kecil: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
+      counter: item.counter || 0,
+      timesRead: item.counter || 0,
+      url: item.permalink,
+      rawGambar: item.gambar,
+    }));
+
+    return formattedData;
+  } catch (error) {
+    console.error("Error fetching galeri:", error);
+    return [];
+  }
 };
 
 // Berita Terkini uses /berita without filters (gets all latest news)
@@ -195,7 +221,6 @@ export const fetchBeritaTerkini = async (page = 1, limit = 10) => {
       data?.length,
       "articles"
     );
-    console.log(data);
     if (pagination) {
       console.log(
         `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
@@ -337,6 +362,69 @@ export const fetchByCategory = async (category, page = 1, limit = 10) => {
   }
 };
 
+// Fetch album galeri by ID
+export const fetchAlbumById = async (id) => {
+  try {
+    console.log(`🔍 Fetching album with ID: ${id}`);
+    const response = await fetch(`${API_URL}/albumgaleri/${id}`);
+
+    if (!response.ok) {
+      console.error("❌ Response not OK:", response.status);
+      throw new Error("Failed to fetch album");
+    }
+
+    const data = await response.json();
+    console.log("📦 Raw album data:", data);
+
+    // Handle both single object and array responses
+    const albumData = Array.isArray(data) ? data[0] : data;
+
+    if (!albumData) {
+      console.error("❌ No album data found");
+      return null;
+    }
+
+    // Format album data
+    const formatted = {
+      id: albumData.id_album,
+      judul: albumData.nama_album,
+      judul_berita: albumData.nama_album,
+      tag: "Galeri",
+      tanggal: formatDate(
+        albumData.tanggal_album,
+        albumData.waktu || "00:00:00"
+      ),
+      description: albumData.keterangan || "",
+      isi: albumData.keterangan || "",
+      gambar: albumData.gambar
+        ? `/foto/galeri/${albumData.gambar}`
+        : "/image.png",
+      image: albumData.gambar
+        ? `/foto/galeri/${albumData.gambar}`
+        : "/image.png",
+      foto_kecil: albumData.gambar
+        ? `/foto/galeri/${albumData.gambar}`
+        : "/image.png",
+      ket_foto: albumData.keterangan || "",
+      counter: albumData.counter || 0,
+      timesRead: albumData.counter || 0,
+      url: albumData.permalink,
+      rawGambar: albumData.gambar,
+      lastUpdated: formatLastUpdated(albumData.updated_at),
+      reporter: "Redaksi",
+      penulis: "Redaksi",
+      nama_kategori: "Galeri",
+      permalink: "galeri",
+    };
+
+    console.log("✅ Formatted album:", formatted);
+    return formatted;
+  } catch (error) {
+    console.error("❌ Error fetching album:", error);
+    return null;
+  }
+};
+
 // New function to fetch related articles for "Baca Juga" section
 export const fetchRelatedArticles = async (articleId, limit = 2) => {
   try {
@@ -367,6 +455,65 @@ export const fetchSearchResults = async (query) => {
     return formatArticleData(data);
   } catch (error) {
     console.error("Error fetching search results:", error);
+    return [];
+  }
+};
+
+// Fetch banners/ads
+export const fetchBanners = async () => {
+  try {
+    console.log(`🎯 Fetching banners...`);
+    const response = await fetch(`${API_URL}/banner`);
+    if (!response.ok) throw new Error("Failed to fetch banners");
+    const data = await response.json();
+    console.log(`📦 Banners:`, data?.length, "items");
+
+    // Format banner data
+    const formatted = data.map((item) => ({
+      id: item.id_banner,
+      id_banner: item.id_banner,
+      id_posbanner: item.id_posbanner,
+      posbanner: item.posbanner,
+      permalink: item.permalink,
+      judul: item.judul,
+      keterangan: item.keterangan,
+      foto_besar: item.foto_besar ? `/foto/banner/${item.foto_besar}` : null,
+      foto_kecil: item.foto_kecil ? `/foto/banner/${item.foto_kecil}` : null,
+      image: item.foto_besar ? `/foto/banner/${item.foto_besar}` : null, // default to large image
+      status: item.status,
+      status2: item.status2,
+      tanggal: item.tanggal,
+      waktu: item.waktu,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    }));
+
+    return formatted;
+  } catch (error) {
+    console.error("Error fetching banners:", error);
+    return [];
+  }
+};
+
+// Fetch banners by position
+export const fetchBannersByPosition = async (position) => {
+  try {
+    console.log(`🎯 Fetching banners for position: ${position}`);
+    const banners = await fetchBanners();
+
+    // Filter by position permalink or position name
+    const filtered = banners.filter(
+      (banner) =>
+        banner.permalink === position ||
+        banner.posbanner.toLowerCase().includes(position.toLowerCase())
+    );
+
+    console.log(
+      `📦 Found ${filtered.length} banner(s) for position: ${position}`
+    );
+    return filtered;
+  } catch (error) {
+    console.error(`Error fetching banners for position ${position}:`, error);
     return [];
   }
 };

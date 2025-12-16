@@ -1,34 +1,51 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Tag from "../components/Tag";
-import { fetchArticleById, fetchRelatedArticles } from "../services/api";
+import {
+  fetchArticleById,
+  fetchAlbumById,
+  fetchRelatedArticles,
+} from "../services/api";
 
 function ArticleDetailPage() {
-  const { id } = useParams();
+  const { id, type } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [article, setArticle] = useState(null);
   const [relatedArticles, setRelatedArticles] = useState([]);
   const [bacaJugaArticles, setBacaJugaArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Detect if this is a galeri album based on route
+  const isGaleri = type === "galeri" || location.pathname.includes("/galeri/");
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const articleData = await fetchArticleById(id);
-        console.log("✅ Article loaded:", articleData);
+        // Fetch article or album based on type
+        const articleData = isGaleri
+          ? await fetchAlbumById(id)
+          : await fetchArticleById(id);
+        console.log(
+          `✅ ${isGaleri ? "Album" : "Article"} loaded:`,
+          articleData
+        );
         if (articleData) {
           setArticle(articleData);
           console.log("✅ Article state set");
-          // Use the new dedicated related articles endpoint
-          try {
-            const related = await fetchRelatedArticles(articleData.id, 5);
-            setRelatedArticles(related.slice(0, 3));
-            setBacaJugaArticles(related.slice(0, 2));
-          } catch (headlineError) {
-            console.warn("Could not load related articles:", headlineError);
-            setRelatedArticles([]);
-            setBacaJugaArticles([]);
+          // Only fetch related articles for regular articles, not galeri
+          if (!isGaleri) {
+            try {
+              const related = await fetchRelatedArticles(articleData.id, 5);
+              setRelatedArticles(related.slice(0, 3));
+              setBacaJugaArticles(related.slice(0, 2));
+            } catch (headlineError) {
+              console.warn("Could not load related articles:", headlineError);
+              setRelatedArticles([]);
+              setBacaJugaArticles([]);
+            }
           }
         } else {
           console.error("❌ No article data returned");
@@ -194,6 +211,32 @@ function ArticleDetailPage() {
                 </div>
               </>
             )}
+            <span className="hidden md:inline">|</span>
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <span>
+                <span className="font-semibold">Dibaca:</span>{" "}
+                {article.timesRead || 0} kali
+              </span>
+            </div>
           </div>
           {/* Share Button - Single Icon with Dropdown */}
           <div className="relative mb-6">
@@ -441,7 +484,7 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
     <>
       {/* First half of content */}
       <div
-        className="prose max-w-none text-justify"
+        className="prose max-w-none"
         dangerouslySetInnerHTML={{ __html: firstHalf }}
       ></div>
 
@@ -510,7 +553,7 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
       {/* Second half of content */}
       {secondHalf && (
         <div
-          className="prose max-w-none text-justify"
+          className="prose max-w-none"
           dangerouslySetInnerHTML={{ __html: secondHalf }}
         ></div>
       )}

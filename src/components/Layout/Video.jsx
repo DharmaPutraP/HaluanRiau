@@ -1,9 +1,38 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { parseTikTokUrl } from "../../utils/tiktokParser";
+import { fetchBannersByPosition } from "../../services/api";
+import BannerModal from "../BannerModal";
 
 function Video() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef(null);
+  const [banners, setBanners] = useState({
+    video1: null,
+    video2: null,
+    video3: null,
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBanner, setSelectedBanner] = useState(null);
+
+  useEffect(() => {
+    const loadBanners = async () => {
+      try {
+        const [banner1, banner2, banner3] = await Promise.all([
+          fetchBannersByPosition("video 1"),
+          fetchBannersByPosition("video 2"),
+          fetchBannersByPosition("video 3"),
+        ]);
+        setBanners({
+          video1: banner1 && banner1.length > 0 ? banner1[0] : null,
+          video2: banner2 && banner2.length > 0 ? banner2[0] : null,
+          video3: banner3 && banner3.length > 0 ? banner3[0] : null,
+        });
+      } catch (err) {
+        console.error("Error fetching video banners:", err);
+      }
+    };
+    loadBanners();
+  }, []);
 
   // TikTok video share URLs
   const videoInputs = [
@@ -24,6 +53,60 @@ function Video() {
       return parsed ? { id: index + 1, ...parsed } : null;
     })
     .filter(Boolean);
+
+  // Insert banners at positions 1, 2, 3 if they exist (videos are pushed after banners)
+  const displayItems = [];
+  let videoIndex = 0;
+
+  // Position 1 (index 0)
+  if (banners.video1) {
+    displayItems.push({
+      type: "banner",
+      data: banners.video1,
+      position: "video 1",
+    });
+  }
+  if (videos[videoIndex]) {
+    displayItems.push({ type: "video", data: videos[videoIndex] });
+    videoIndex++;
+  }
+
+  // Position 2 (index 1)
+  if (banners.video2) {
+    displayItems.push({
+      type: "banner",
+      data: banners.video2,
+      position: "video 2",
+    });
+  }
+  if (videos[videoIndex]) {
+    displayItems.push({ type: "video", data: videos[videoIndex] });
+    videoIndex++;
+  }
+
+  // Position 3 (index 2)
+  if (banners.video3) {
+    displayItems.push({
+      type: "banner",
+      data: banners.video3,
+      position: "video 3",
+    });
+  }
+  if (videos[videoIndex]) {
+    displayItems.push({ type: "video", data: videos[videoIndex] });
+    videoIndex++;
+  }
+
+  // Add remaining videos
+  while (videoIndex < videos.length) {
+    displayItems.push({ type: "video", data: videos[videoIndex] });
+    videoIndex++;
+  }
+
+  const handleBannerClick = (banner) => {
+    setSelectedBanner(banner);
+    setIsModalOpen(true);
+  };
 
   // Get number of visible items based on screen width
   const getVisibleItems = () => {
@@ -56,7 +139,7 @@ function Video() {
 
   const handleNext = () => {
     const visibleItems = getVisibleItems();
-    if (currentIndex < videos.length - Math.floor(visibleItems)) {
+    if (currentIndex < displayItems.length - Math.floor(visibleItems)) {
       scrollToIndex(currentIndex + 1);
     }
   };
@@ -111,23 +194,40 @@ function Video() {
             className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-2 sm:px-4 md:px-10"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {videos.map((video, index) => (
-              <a
-                key={video.id}
-                href={video.tiktokUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
-              >
-                <iframe
-                  src={video.embedUrl}
-                  className="w-full h-full pointer-events-none"
-                  allowFullScreen
-                  scrolling="no"
-                  allow="encrypted-media"
-                />
-              </a>
-            ))}
+            {displayItems.map((item, index) => {
+              if (item.type === "banner") {
+                return (
+                  <div
+                    key={`banner-${item.position}`}
+                    onClick={() => handleBannerClick(item.data)}
+                    className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-xl transition-shadow"
+                  >
+                    <img
+                      src={item.data.image}
+                      alt={item.data.judul}
+                      className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                    />
+                  </div>
+                );
+              }
+              return (
+                <a
+                  key={item.data.id}
+                  href={item.data.tiktokUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
+                >
+                  <iframe
+                    src={item.data.embedUrl}
+                    className="w-full h-full pointer-events-none"
+                    allowFullScreen
+                    scrolling="no"
+                    allow="encrypted-media"
+                  />
+                </a>
+              );
+            })}
             {/* See More Link */}
             <a
               href="/videos"
@@ -160,10 +260,10 @@ function Video() {
         <button
           onClick={handleNext}
           disabled={
-            currentIndex >= videos.length - Math.floor(getVisibleItems())
+            currentIndex >= displayItems.length - Math.floor(getVisibleItems())
           }
           className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary text-white rounded-l-lg sm:rounded-r-full h-20 sm:h-32 md:h-full w-8 sm:w-10 flex items-center justify-center shadow-lg transition-all hover:bg-primary-dark cursor-pointer ${
-            currentIndex >= videos.length - Math.floor(getVisibleItems())
+            currentIndex >= displayItems.length - Math.floor(getVisibleItems())
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}
@@ -184,6 +284,13 @@ function Video() {
           </svg>
         </button>
       </div>
+
+      <BannerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        imageUrl={selectedBanner?.image}
+        imageAlt={selectedBanner?.judul}
+      />
     </div>
   );
 }

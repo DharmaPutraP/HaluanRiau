@@ -3,28 +3,25 @@ import Tag from "../Tag";
 
 function LeftHeadline({ data = [] }) {
   return (
-    <div className="flex-initial flex flex-col w-full md:w-1/4 gap-3">
+    <div className="flex-initial flex flex-col w-full md:w-1/4 gap-4">
       {data.map((item, index) => (
         <Link
           key={index}
           to={`/article/${item.id}/${item.url}`}
           className={`block hover:opacity-80 transition-opacity ${
-            index === 0 ? "" : "flex-1"
+            index < data.length - 1 ? "pb-4 border-b border-gray-300" : ""
           }`}
         >
-          <Tag judul={item.tag} className="text-xs" />
-          <p className="text-md mt-1 leading-4 font-bold">{item.judul}</p>
-          <div className="flex items-center text-[0.7rem] gap-2 mt-1">
-            <p className="text-gray-500">{item.tanggal}</p>
+          <Tag judul={item.tag} className="text-xs mb-2" />
+          <p className="text-sm md:text-base leading-tight font-bold mb-2">
+            {item.judul}
+          </p>
+          <div className="flex items-center text-[0.65rem] md:text-[0.7rem] gap-2 mb-2 text-gray-600">
+            <p>{item.tanggal}</p>
             <div>|</div>
             <p>{item.lastUpdated}</p>
           </div>
-          {/* <p className="text-xs mt-2 mb-2">{item.description}</p> */}
-          <div
-            className={`flex text-[#EE4339] font-bold text-xs ${
-              index === 0 ? "border-b-2 pb-2 border-gray-500" : ""
-            }`}
-          >
+          <div className="flex items-center text-[#EE4339] font-bold text-xs">
             <p>Lebih Lengkap</p>
             <svg
               fill="currentColor"
