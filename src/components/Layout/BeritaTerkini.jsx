@@ -3,6 +3,7 @@ import Button from "../Button";
 
 function BeritaTerkini({ data = [] }) {
   const headlines = data.slice(0, 10);
+  console.log(headlines);
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
       <div className="flex gap-2 border-b-3 w-fit border-primary mb-3 items-center">

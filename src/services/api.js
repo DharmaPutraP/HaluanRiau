@@ -6,7 +6,10 @@ const formatArticleData = (apiData) => {
     id: item.id_berita,
     judul: item.judul_berita,
     judul_berita: item.judul_berita, // Keep original for article detail page
-    tag: getCategoryName(item.id_kategori),
+    tag: item.nama_kategori,
+    nama_kategori: item.nama_kategori, // Add nama_kategori separately
+    permalink: item.permalink, // Add permalink for category
+    sumber: item.sumber,
     tanggal: formatDate(item.tanggal, item.waktu),
     lastUpdated: formatLastUpdated(item.updated_at),
     description: stripHtml(item.isi).substring(0, 200) + "...",
@@ -66,22 +69,6 @@ const formatLastUpdated = (datetime) => {
   }
 };
 
-// Get category name from ID
-const getCategoryName = (id) => {
-  const categories = {
-    1: "Nasional",
-    2: "Riau",
-    3: "Politik",
-    4: "Hukum",
-    5: "Ekonomi",
-    6: "Olahraga",
-    7: "Budaya",
-    8: "Teknologi",
-    // Add more categories as needed
-  };
-  return categories[id] || "Berita";
-};
-
 // Generic function to fetch by category with pagination
 const fetchByKategori = async (kategori, page = 1, limit = 10) => {
   try {
@@ -124,6 +111,9 @@ const fetchBySpecialFilter = async (
 ) => {
   try {
     const response = await fetch(
+      `${API_URL}/berita?halaman=${page}&limit=${limit}&${filterName}=${filterValue}`
+    );
+    console.log(
       `${API_URL}/berita?halaman=${page}&limit=${limit}&${filterName}=${filterValue}`
     );
 
@@ -187,11 +177,11 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
   return result.articles;
 };
 
-// Berita Terkini uses a different endpoint with pagination
+// Berita Terkini uses /berita without filters (gets all latest news)
 export const fetchBeritaTerkini = async (page = 1, limit = 10) => {
   try {
     const response = await fetch(
-      `${API_URL}/terkiniglobal?halaman=${page}&limit=${limit}`
+      `${API_URL}/berita?halaman=${page}&limit=${limit}`
     );
     if (!response.ok) throw new Error("Failed to fetch berita terkini");
     const responseData = await response.json();
@@ -205,6 +195,7 @@ export const fetchBeritaTerkini = async (page = 1, limit = 10) => {
       data?.length,
       "articles"
     );
+    console.log(data);
     if (pagination) {
       console.log(
         `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`

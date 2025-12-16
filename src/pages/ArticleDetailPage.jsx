@@ -11,7 +11,6 @@ function ArticleDetailPage() {
   const [relatedArticles, setRelatedArticles] = useState([]);
   const [bacaJugaArticles, setBacaJugaArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -72,7 +71,7 @@ function ArticleDetailPage() {
     return (
       <div className="md:mx-24">
         <div className="bg-white px-5 md:px-10 py-16 mt-2 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EE4339] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Memuat artikel...</p>
         </div>
       </div>
@@ -171,6 +170,30 @@ function ArticleDetailPage() {
                 {article.penulis}
               </span>
             </div>
+            {article.sumber && (
+              <>
+                <span className="hidden md:inline">|</span>
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
+                  </svg>
+                  <span>
+                    <span className="font-semibold">Sumber:</span>{" "}
+                    {article.sumber}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
           {/* Share Button - Single Icon with Dropdown */}
           <div className="relative mb-6">
@@ -338,7 +361,7 @@ function ArticleDetailPage() {
         <div className="mt-6 pt-4 border-t border-gray-200">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-gray-700">Tags:</span>
-            <Tag judul={article.tag} className="text-xs" />
+            <Tag judul={article.nama_kategori} className="text-xs" />
           </div>
         </div>
 

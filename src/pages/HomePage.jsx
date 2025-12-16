@@ -226,7 +226,7 @@ function HomePage() {
           <MixLayoutSkeleton />
         )}
         {advertorial.length > 0 ? (
-          <MixLayout title="ADVETORIAL" data={advertorial} />
+          <MixLayout title="ADVERTORIAL" data={advertorial} />
         ) : (
           <MixLayoutSkeleton />
         )}

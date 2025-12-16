@@ -229,7 +229,7 @@ function Navbar() {
                           key={index}
                           href={`/category/${item
                             .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
+                            .replace(/[\s&]+/g, "-")}`}
                           className="block px-4 py-2 hover:bg-gray-100 capitalize"
                         >
                           {item}
@@ -283,7 +283,7 @@ function Navbar() {
               {/* Desktop Right Side - Ticker & Search */}
               <div className="hidden md:flex items-center space-x-4">
                 <a
-                  href="/category/headline"
+                  href="/category/indeks-berita"
                   className="text-sm font-medium hover:text-gray-200"
                 >
                   INDEKS BERITA +

@@ -235,7 +235,7 @@ function CategoryPage() {
     <div className="md:mx-24">
       <div className="bg-white px-5 md:px-10 py-6">
         {/* Header with Title and Date Filter */}
-        <div className="mb-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b-4 border-[#EE4339]">
+        <div className="mb-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b-4 border-primary">
           {/* Title */}
           <div className="flex items-center gap-2 md:gap-3 pb-2 w-fit">
             <h1 className="text-lg md:text-2xl font-bold">{pageTitle}</h1>
