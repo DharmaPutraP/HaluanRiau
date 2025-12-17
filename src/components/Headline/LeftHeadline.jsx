@@ -8,12 +8,12 @@ function LeftHeadline({ data = [] }) {
         <Link
           key={index}
           to={`/article/${item.id}/${item.url}`}
-          className={`block hover:opacity-80 transition-opacity ${
+          className={`flex flex-col hover:opacity-80 transition-opacity ${
             index < data.length - 1 ? "pb-4 border-b border-gray-300" : ""
           }`}
         >
           <Tag judul={item.tag} className="text-xs mb-2" />
-          <p className="text-sm md:text-base leading-tight font-bold mb-2">
+          <p className="text-sm md:text-base leading-tight font-bold mb-2 line-clamp-3 grow">
             {item.judul}
           </p>
           <div className="flex items-center text-[0.65rem] md:text-[0.7rem] gap-2 mb-2 text-gray-600">

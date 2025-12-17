@@ -44,7 +44,7 @@ function MixLayout({ title, data = [] }) {
             key={index}
             className={`${
               index !== topFive.length - 1 ? " border-b border-gray-300" : ""
-            } w-full`}
+            } w-full flex`}
           >
             {index === 0 && (
               <BasicArtikel

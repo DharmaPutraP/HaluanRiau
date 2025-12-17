@@ -31,7 +31,7 @@ function Riau({ data = [] }) {
             key={index}
             className={`${
               index !== 0 ? "ms-4 ps-4 border-l border-gray-300" : ""
-            } w-full`}
+            } w-full flex`}
           >
             <BasicArtikel
               title={item.judul}
@@ -50,7 +50,7 @@ function Riau({ data = [] }) {
         {topSix.map((item, index) => (
           <div
             key={index}
-            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-1/2`}
+            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-1/2 flex`}
           >
             <BasicArtikel
               title={item.judul}

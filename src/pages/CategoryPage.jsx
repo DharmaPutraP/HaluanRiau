@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Tag from "../components/Tag";
 import { fetchByCategory } from "../services/api";
+import ContentBottomSections from "../components/ContentBottomSections";
 
 function CategoryPage() {
   const { category } = useParams();
@@ -452,6 +453,8 @@ function CategoryPage() {
           </div>
         )}
       </div>
+
+      <ContentBottomSections />
     </div>
   );
 }

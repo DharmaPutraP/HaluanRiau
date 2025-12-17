@@ -54,11 +54,10 @@ function Video() {
     })
     .filter(Boolean);
 
-  // Insert banners at positions 1, 2, 3 if they exist (videos are pushed after banners)
+  // Insert banners first, then videos
   const displayItems = [];
-  let videoIndex = 0;
 
-  // Position 1 (index 0)
+  // Add all banners first in order
   if (banners.video1) {
     displayItems.push({
       type: "banner",
@@ -66,12 +65,7 @@ function Video() {
       position: "video 1",
     });
   }
-  if (videos[videoIndex]) {
-    displayItems.push({ type: "video", data: videos[videoIndex] });
-    videoIndex++;
-  }
 
-  // Position 2 (index 1)
   if (banners.video2) {
     displayItems.push({
       type: "banner",
@@ -79,12 +73,7 @@ function Video() {
       position: "video 2",
     });
   }
-  if (videos[videoIndex]) {
-    displayItems.push({ type: "video", data: videos[videoIndex] });
-    videoIndex++;
-  }
 
-  // Position 3 (index 2)
   if (banners.video3) {
     displayItems.push({
       type: "banner",
@@ -92,16 +81,11 @@ function Video() {
       position: "video 3",
     });
   }
-  if (videos[videoIndex]) {
-    displayItems.push({ type: "video", data: videos[videoIndex] });
-    videoIndex++;
-  }
 
-  // Add remaining videos
-  while (videoIndex < videos.length) {
-    displayItems.push({ type: "video", data: videos[videoIndex] });
-    videoIndex++;
-  }
+  // Add all videos after banners
+  videos.forEach((video) => {
+    displayItems.push({ type: "video", data: video });
+  });
 
   const handleBannerClick = (banner) => {
     setSelectedBanner(banner);
@@ -200,12 +184,12 @@ function Video() {
                   <div
                     key={`banner-${item.position}`}
                     onClick={() => handleBannerClick(item.data)}
-                    className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-xl transition-shadow"
+                    className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-xl transition-shadow flex justify-center items-center bg-black"
                   >
                     <img
                       src={item.data.image}
                       alt={item.data.judul}
-                      className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                      className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
                     />
                   </div>
                 );

@@ -466,6 +466,7 @@ export const fetchBanners = async () => {
     const response = await fetch(`${API_URL}/banner`);
     if (!response.ok) throw new Error("Failed to fetch banners");
     const data = await response.json();
+    console.log(data);
     console.log(`📦 Banners:`, data?.length, "items");
 
     // Format banner data
@@ -505,7 +506,8 @@ export const fetchBannersByPosition = async (position) => {
     const filtered = banners.filter(
       (banner) =>
         banner.permalink === position ||
-        banner.posbanner.toLowerCase().includes(position.toLowerCase())
+        (banner.posbanner &&
+          banner.posbanner.toLowerCase().includes(position.toLowerCase()))
     );
 
     console.log(

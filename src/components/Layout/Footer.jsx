@@ -55,27 +55,27 @@ function Footer() {
           </h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/tentang-kami" className="hover:text-[#EE4339]">
                 TENTANG KAMI
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/redaksi" className="hover:text-[#EE4339]">
                 REDAKSI
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/pedoman" className="hover:text-[#EE4339]">
                 PEDOMAN
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/disclaimer" className="hover:text-[#EE4339]">
                 DISCLAIMER
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/kontak" className="hover:text-[#EE4339]">
                 KONTAK
               </a>
             </li>

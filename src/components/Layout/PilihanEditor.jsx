@@ -31,7 +31,7 @@ function PilihanEditor({ data = [] }) {
             key={index}
             className={`${
               index !== 0 ? "ps-4 ms-4 border-l border-gray-300" : ""
-            } w-full`}
+            } w-full flex`}
           >
             <MenuPilihanEditor
               judul={item.judul}

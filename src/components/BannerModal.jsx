@@ -17,7 +17,7 @@ function BannerModal({ isOpen, onClose, imageUrl, imageAlt = "Banner" }) {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75 p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
       onClick={onClose}
     >
       <div className="relative max-w-6xl max-h-screen">
