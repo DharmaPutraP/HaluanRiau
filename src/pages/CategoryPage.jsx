@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, data } from "react-router-dom";
 import Tag from "../components/Tag";
 import { fetchByCategory } from "../services/api";
 import ContentBottomSections from "../components/ContentBottomSections";
@@ -38,17 +38,33 @@ function CategoryPage() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const data = await fetchByCategory(
+        // Pass date filters to server for efficient filtering
+        const response = await fetchByCategory(
           category,
           currentPage,
-          articlesPerPage
+          articlesPerPage,
+          filterStartDate || null,
+          filterEndDate || null
         );
+
+        // Extract articles and pagination from response
+        const data = response.articles || response;
+        const pagination = response.pagination;
+
         setArticles(data);
-        // Estimate total articles - you may need to get this from server
-        if (data.length === articlesPerPage) {
-          setTotalArticles(currentPage * articlesPerPage + 1); // At least one more page
+
+        // Use server's totalPages if available, otherwise estimate
+        if (pagination && pagination.totalPages) {
+          setTotalArticles(
+            pagination.totalItems || pagination.totalPages * articlesPerPage
+          );
         } else {
-          setTotalArticles((currentPage - 1) * articlesPerPage + data.length);
+          // Fallback: estimate total articles
+          if (data.length === articlesPerPage) {
+            setTotalArticles(currentPage * articlesPerPage + 1);
+          } else {
+            setTotalArticles((currentPage - 1) * articlesPerPage + data.length);
+          }
         }
       } catch (error) {
         console.error("Error loading category data:", error);
@@ -59,7 +75,7 @@ function CategoryPage() {
 
     loadData();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [category, currentPage]);
+  }, [category, currentPage, filterStartDate, filterEndDate]);
 
   // Check if it's a section page or category page
   const isSection = sectionConfig[category];
@@ -100,40 +116,8 @@ function CategoryPage() {
     return new Date(year, month, day);
   };
 
-  // Filter articles by date range on client-side (no server request)
-  const filteredArticles = articles.filter((article) => {
-    if (!filterStartDate && !filterEndDate) return true;
-
-    // Extract date from article.tanggal (format: "11 November 2025, 16.15" or "11 November 2025 pukul 14.55")
-    const articleDateStr = article.tanggal
-      .split(",")[0]
-      .split(" pukul")[0]
-      .trim(); // "11 November 2025"
-    const articleDate = parseIndonesianDate(articleDateStr);
-
-    if (!articleDate || isNaN(articleDate.getTime())) {
-      console.warn("Failed to parse date:", articleDateStr);
-      return true; // If date parsing fails, include article
-    }
-
-    const start = filterStartDate ? new Date(filterStartDate) : null;
-    const end = filterEndDate ? new Date(filterEndDate) : null;
-
-    // Set time to start of day for proper comparison
-    if (articleDate) articleDate.setHours(0, 0, 0, 0);
-    if (start) start.setHours(0, 0, 0, 0);
-    if (end) end.setHours(23, 59, 59, 999);
-
-    if (start && end) {
-      return articleDate >= start && articleDate <= end;
-    } else if (start) {
-      return articleDate >= start;
-    } else if (end) {
-      return articleDate <= end;
-    }
-
-    return true;
-  });
+  // Server already filtered the articles, just use them directly
+  const filteredArticles = articles;
 
   const handleSearch = () => {
     // Apply the filter when button is clicked
@@ -151,9 +135,10 @@ function CategoryPage() {
     setCurrentPage(1); // Reset to first page when clearing filter
   };
 
-  // Pagination calculations - now server-side
+  // Pagination calculations - server handles everything
   const totalPages = Math.ceil(totalArticles / articlesPerPage);
-  const currentArticles = filteredArticles; // No slicing needed, already paginated by server
+  const currentArticles = filteredArticles; // Already paginated and filtered by server
+  const maxPagesToShow = 5;
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -174,10 +159,9 @@ function CategoryPage() {
   // Generate page numbers to display
   const getPageNumbers = () => {
     const pages = [];
-    const maxPagesToShow = 5;
 
-    if (totalPages <= maxPagesToShow) {
-      // Show all pages if total is less than max
+    if (totalPages <= 7) {
+      // Show all pages if total is 7 or less
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
@@ -186,17 +170,17 @@ function CategoryPage() {
       pages.push(1);
 
       // Calculate range around current page
-      let startPage = Math.max(2, currentPage - 1);
-      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      let startPage = Math.max(2, currentPage - 2);
+      let endPage = Math.min(totalPages - 1, currentPage + 2);
 
       // Adjust if we're near the beginning
-      if (currentPage <= 3) {
-        endPage = 4;
+      if (currentPage <= 4) {
+        endPage = Math.min(6, totalPages - 1);
       }
 
       // Adjust if we're near the end
-      if (currentPage >= totalPages - 2) {
-        startPage = totalPages - 3;
+      if (currentPage >= totalPages - 3) {
+        startPage = Math.max(2, totalPages - 5);
       }
 
       // Add ellipsis if needed

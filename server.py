@@ -259,14 +259,22 @@ class server:
     def cek_field(self, fields):
         for field in fields:
             if not request.form.get(field):
-                return abort(404, f"{field} GADA ANJENK")
+                print(f"FIeld {field} ga ada anjnek")
+                
+                return abort(501, f"{field} GADA ANJENK")
+            else:
+                print(f"FIeld {field} ada")
         
     def cek_image(self, namadarielementnya):
+        print(f"REQUEST FILE = {request.files}")
         if namadarielementnya not in  request.files:
+            print("FOTONYAMANA ")
             return abort(404, "FOTONYA MANA GOBLOKK")
         if request.files[namadarielementnya].filename == "":
+            print("FOTONYA GAK DIMASUKKAN ")
             return abort(404, "FOTONYA KOK GAK DIMASUKKAN GOBLOKK")
-        if ".png" not in request.files[namadarielementnya].filename and ".jpg" not in request.files[namadarielementnya].filename:
+        if ".png" not in request.files[namadarielementnya].filename and ".jpg" not in request.files[namadarielementnya].filename and ".jpeg" not in request.files[namadarielementnya].filename:
+            print("FORMAT FOTO ")
             return abort(404, "FORMAT FOTONYA BUKAN PNG ATAU JPG GOBLOKK")
             
         
@@ -289,13 +297,16 @@ class server:
        
     def simpan_foto_ori(self, r_image, path_gambar, simpanfotolowres=False, scale=0.185):
         nama_gambar_ori =  str(randint(100000000000,999999999999))+ '-' + r_image.filename
-        path_gambar_ori = path_gambar + 'original/'+nama_gambar_ori
+        path_gambar_ori = path_gambar + 'original/'+nama_gambar_ori if 'berita' in path_gambar else path_gambar + nama_gambar_ori
         r_image.save(path_gambar_ori)
         
         if simpanfotolowres:
-            img = Image.open(path_gambar_ori)
-            img_r = img.resize((int(img.width*scale), int(img.height*scale)), Image.Resampling.LANCZOS)
-            img_r.save(path_gambar + 'large/' + nama_gambar_ori)
+            if 'berita' in path_gambar:
+                img = Image.open(path_gambar_ori)
+                img_r = img.resize((int(img.width*scale), int(img.height*scale)), Image.Resampling.LANCZOS)
+                img_r.save(path_gambar + 'large/' + nama_gambar_ori)
+            else:
+                print('gabisa save foto lowres karna bukan berita')
         return nama_gambar_ori
         
     def hapus_foto(self, pathfotolama):
@@ -315,27 +326,28 @@ class server:
         #     return render_template("cobaget.html")
 
         def jeroanberita():
-            fields = ['title', 
-                      'content', 
-                      'judulkhusus', 
-                      'status', 
+            fields = ['judul_berita', 
+                      'isi', 
+                    #   'judul_khusus', 
+                      'post_status', 
                       'tanggal', 
                       'waktu', 
                       'kategori', 
-                      'subkategori', 
-                      'topik', 
-                      'description', 
-                      'tags',    
-                      'caption', 
-                      'watermark', 
-                      'headline', 
-                      'pilihaneditor', 
-                      'advertorial', 
-                      'sumber', 
-                      'reporter',
-                      'editor',
+                    #   'subkategori', 
+                    #   'topik', 
+                    #   'description', 
+                    #   'tags',    
+                    #   'ket_foto', 
+                    #   'watermark', 
+                    #   'headline', 
+                    #   'pil_editor', 
+                    #   'advertorial', 
+                    #   'sumber', 
+                    #   'reporter',
+                      'penulis',
                       'created_at',
                       'updated_at',
+                      'id_user_login',
                       ]
             name_image = 'upload-image'
             self.cek_field(fields)
@@ -344,10 +356,10 @@ class server:
             # r_judulkhusus = request.form.get('judulkhusus');r_watermark = request.form.get('watermark')
             # LEAD ????? KODE REDAKTUR ????
 
-            r_title = request.form.get('title')
-            r_content = request.form.get('content')
-            r_judulkhusus = request.form.get('judulkhusus')
-            r_status = request.form.get('status')
+            r_title = request.form.get('judul_berita')
+            r_content = request.form.get('isi')
+            r_judulkhusus = request.form.get('judul_khusus')
+            r_status = request.form.get('post_status')
             r_tanggal = request.form.get('tanggal')
             r_waktu = request.form.get('waktu')
             r_kategori = request.form.get('kategori')
@@ -356,17 +368,17 @@ class server:
             r_description = request.form.get('description')
             r_tags = request.form.get('tags')
             r_upload_image = request.files[name_image]
-            r_caption = request.form.get('caption') 
+            r_caption = request.form.get('ket_foto') 
             r_watermark = request.form.get('watermark')
             r_headline = request.form.get('headline')
-            r_pilihaneditor = request.form.get('pilihaneditor')
+            r_pilihaneditor = request.form.get('pil_editor')
             r_advertorial = request.form.get('advertorial')
             r_sumber = request.form.get('sumber')
             r_reporter = request.form.get('reporter')
-            r_editor = request.form.get('editor')
-            r_createdat = request.form.get('createdat')
-            r_updatedat = request.form.get('updatedat')
-            r_iduserlogin = request.form.get('iduserlogin')
+            r_editor = request.form.get('penulis')
+            r_createdat = request.form.get('created_at')
+            r_updatedat = request.form.get('updated_at')
+            r_iduserlogin = request.form.get('id_user_login')
             
             r_kategori = self.konversi_ke_id(namatabel='tblkategori', value_request=r_kategori, nama_original_target='nama_kategori', nama_id_target='id_kategori')
             r_subkategori = self.konversi_ke_id(namatabel='tblsub', value_request=r_subkategori, nama_original_target='sub', nama_id_target='id_sub')
@@ -391,7 +403,7 @@ class server:
                     'url' : title_url, 
                     'ket_foto' : r_caption, 
                     'watermark' : r_watermark, 
-                    'tag_foto' : r_tags, 
+                    'tags' : r_tags, 
                     'headline' : r_headline, 
                     'foto_kecil' : nama_gambar_baru, 
                     'id_sub' : r_subkategori, 
@@ -430,12 +442,30 @@ class server:
                 # Kategori (optional - bisa kosong untuk special filters)
                 kategori = request.args.get("kategori", "", type=str)
                 
+                publish = request.args.get("publish", "Y", type=str)
+                
+                # Date filtering parameters
+                start_date = request.args.get("start_date", None, type=str)
+                end_date = request.args.get("end_date", None, type=str)
+                
+                # Debug log
+                print(f"[DEBUG] Berita - Start: {start_date}, End: {end_date}")
+
+                search = request.args.get("search", "", type=str)
+
                 # Build kondisi
                 kondisi_parts = []
                 
                 # Add kategori filter only if provided
                 if kategori:
                     kondisi_parts.append(f"tblkategori.permalink = '{kategori}'")
+
+                # Add search filter if provided
+                if search:
+                    keywords = search.strip().split()
+                    for kw in keywords:
+                        kw = kw.replace("'", "''")
+                        kondisi_parts.append(f"tblberita.judul_berita LIKE '%{kw}%'")
                 
                 # Special filters
                 if terpopuler == 1:
@@ -448,9 +478,22 @@ class server:
                     kondisi_parts.append(f"tblberita.advertorial = 1")
                 if watermark == 1:
                     kondisi_parts.append(f"tblberita.watermark = 1")
+
+                # Filter publish
+                if publish.upper() == 'Y':
+                    kondisi_parts.append(f"tblberita.publish = 'Y'")
+                
+                # Add date filters if provided
+                if start_date:
+                    kondisi_parts.append(f"tblberita.tanggal >= '{start_date}'")
+                if end_date:
+                    kondisi_parts.append(f"tblberita.tanggal <= '{end_date}'")
                 
                 # Join conditions with AND
                 kondisi = " AND ".join(kondisi_parts) if kondisi_parts else ""
+                
+                # Debug log the query
+                print(f"[DEBUG] Query kondisi: {kondisi}")
                 
                 # Get paginated articles directly (no need to fetch all for counting)
                 order_by = "ORDER BY tblberita.counter DESC" if terpopuler == 1 else "ORDER BY tblberita.tanggal DESC, tblberita.waktu DESC"
@@ -461,19 +504,27 @@ class server:
                     klausa=f"{order_by} LIMIT {limit} OFFSET {offset}"
                 )
                 
+                print(f"[DEBUG] Found {len(articles)} articles")
+                
                 # Use SQL COUNT for total (much faster)
                 total = 0
                 try:
-                    self.database._ensure_connection()  # Ensure connection before COUNT
-                    if self.database.perantara:
+                    # Use raw SQL for COUNT
+                    self.database._ensure_connection()
+                    _, perantara = self.database._get_connection()
+                    if perantara:
                         count_query = f"SELECT COUNT(*) as total FROM {namatabel} JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori"
                         if kondisi:
                             count_query += f" WHERE {kondisi}"
-                        self.database.perantara.execute(count_query)
-                        count_result = self.database.perantara.fetchone()
+                        print(f"[COUNT] Query: {count_query}")
+                        perantara.execute(count_query)
+                        count_result = perantara.fetchone()
                         total = count_result['total'] if count_result else 0
+                        print(f"[COUNT] Total: {total}")
                 except Exception as e:
-                    print(f"COUNT query error: {e}")
+                    print(f"[ERROR] COUNT query error: {e}")
+                    import traceback
+                    traceback.print_exc()
                     total = len(articles)  # Fallback to article count
                 
                 return jsonify({
@@ -487,6 +538,7 @@ class server:
                 })
             else:
                 data = jeroanberita()
+                print(data)
                 self.database.INSERT(namatabel, data)
                 return jsonify(data)
         
@@ -522,7 +574,7 @@ class server:
                 list_keyword = judul_berita.split('-')
                 results = []
                 for keyword in list_keyword:
-                    x = self.database.SELECT(namatabel, kondisi=f"judul_berita LIKE '%{keyword}%'")
+                    x = self.database.SELECT(namatabel,operasi="JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori" , kondisi=f"judul_berita LIKE '%{keyword}%'", klausa="ORDER BY tblberita.tanggal DESC")
                     if x:
                         results.extend(x)
                 # Remove duplicates
@@ -539,11 +591,26 @@ class server:
             halaman = request.args.get("halaman", 1, type=int)
             offset = (halaman - 1) * limit
             
-            # Get paginated articles directly
+            # Date filtering parameters
+            start_date = request.args.get("start_date", None, type=str)
+            end_date = request.args.get("end_date", None, type=str)
+            
+            # Build WHERE condition
+            kondisi_parts = [f"tblkategori.permalink = '{kategori}'"]
+            
+            # Add date filters if provided
+            if start_date:
+                kondisi_parts.append(f"tblberita.tanggal >= '{start_date}'")
+            if end_date:
+                kondisi_parts.append(f"tblberita.tanggal <= '{end_date}'")
+            
+            kondisi = " AND ".join(kondisi_parts)
+            
+            # Get paginated articles with date filter
             articles = self.database.SELECT(
                 namatabel=namatabel,
                 operasi="JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori",
-                kondisi=f"tblkategori.permalink = '{kategori}'",
+                kondisi=kondisi,
                 klausa=f"ORDER BY tblberita.tanggal DESC, tblberita.waktu DESC LIMIT {limit} OFFSET {offset}"
             )
             
@@ -553,12 +620,16 @@ class server:
                 self.database._ensure_connection()  # Ensure connection before COUNT
                 _, perantara = self.database._get_connection()
                 if perantara:
-                    count_query = f"SELECT COUNT(*) as total FROM {namatabel} JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori WHERE tblkategori.permalink = '{kategori}'"
+                    count_query = f"SELECT COUNT(*) as total FROM {namatabel} JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori WHERE {kondisi}"
+                    print(f"[COUNT] Query: {count_query}")
                     perantara.execute(count_query)
                     count_result = perantara.fetchone()
                     total = count_result['total'] if count_result else 0
+                    print(f"[COUNT] Total: {total}")
             except Exception as e:
-                print(f"COUNT query error: {e}")
+                print(f"[ERROR] COUNT query error: {e}")
+                import traceback
+                traceback.print_exc()
                 total = len(articles)  # Fallback to article count
             
             return jsonify({
@@ -640,16 +711,17 @@ class server:
         
         
         def jeroankategori(TIPE=""):
-            fields = ['namakategori','createdat', 'updatedat']
+            fields = ['nama_kategori', 'pin' ,'created_at', 'updated_at']
             self.cek_field(fields)
-            r_namakategori = request.form.get("namakategori")
-            r_createdat = request.form.get("createdat")
-            r_updatedat = request.form.get("updatedat")
+            r_namakategori = request.form.get("nama_kategori")
+            r_pin = request.form.get("pin")
+            r_createdat = request.form.get("created_at")
+            r_updatedat = request.form.get("updated_at")
             if TIPE == "POST":
                 link_kategori = r_namakategori.lower().replace(" ","-")
             else:
                 link_kategori = request.form.get("kategoriurl")
-            data = {'nama_kategori' : r_namakategori, 'permalink': link_kategori, 'created_at' : r_createdat, 'updated_at' : r_updatedat}
+            data = {'nama_kategori' : r_namakategori, 'pin': r_pin, 'permalink': link_kategori, 'created_at' : r_createdat, 'updated_at' : r_updatedat}
             return data
             
         @self.server.route("/kategori", methods=["GET", "POST"])
@@ -678,12 +750,12 @@ class server:
                 
                 
         def jeroansubkategori(TIPE=""):
-            fields = ['kategori', 'subkategori','createdat', 'updatedat']
+            fields = ['kategori', 'sub','created_at', 'updated_at']
             self.cek_field(fields)
             r_kategori = request.form.get("kategori")       
-            r_subkategori = request.form.get("subkategori")  
-            r_createdat = request.form.get("createdat")
-            r_updatedat = request.form.get("updatedat")              
+            r_subkategori = request.form.get("sub")  
+            r_createdat = request.form.get("created_at")
+            r_updatedat = request.form.get("updated_at")              
             if TIPE == "POST":
                 link_subkategori = r_subkategori.lower().replace(" ","-")     
             else:
@@ -720,12 +792,12 @@ class server:
         
         
         def jeroanpages(TIPE=""):
-            fields = ['title', 'content', 'createdat', 'updatedat']
+            fields = ['title', 'content', 'created_at', 'updated_at']
             self.cek_field(fields)
             r_title = request.form.get("title")
             r_content = request.form.get("content")
-            r_createdat = request.form.get("createdat")
-            r_updatedat = request.form.get("updatedat")
+            r_createdat = request.form.get("created_at")
+            r_updatedat = request.form.get("updated_at")
             if TIPE == "POST":
                 link_title = r_title.lower().replace(" ","-")
             else:
@@ -759,11 +831,11 @@ class server:
         
         
         def jeroantopik():
-            fields = ['topik', 'createdat', 'updatedat']
+            fields = ['topik', 'created_at', 'updated_at']
             self.cek_field(fields)
             r_topik = request.form.get('topik')
-            r_createdat = request.form.get('createdat')
-            r_updatedat = request.form.get('updatedat')
+            r_createdat = request.form.get('created_at')
+            r_updatedat = request.form.get('updated_at')
             data = {'topik' : r_topik, 'created_at' : r_createdat, 'updated_at' : r_updatedat}
             return data
         
@@ -801,18 +873,18 @@ class server:
         
         
         def jeroanalbumgaleri():
-            fields = ['title', 'content', 'tanggal', 'waktu', 'subkategori', 'createdat', 'updatedat']
+            fields = ['nama_album', 'keterangan', 'tanggal_album', 'waktu', 'sub', 'created_at', 'updated_at']
             name_image = 'upload-image'
             self.cek_field(fields)
             self.cek_image(name_image)
 
-            r_title = request.form.get('title')
-            r_content = request.form.get('content')
-            r_tanggal = request.form.get('tanggal')
+            r_title = request.form.get('nama_album')
+            r_content = request.form.get('keterangan')
+            r_tanggal = request.form.get('tanggal_album')
             r_waktu = request.form.get('waktu')
-            r_subkategori =  request.form.get('subkategori')
-            r_createdat =  request.form.get('createdat')
-            r_updatedat = request.form.get('updatedat')
+            r_subkategori =  request.form.get('sub')
+            r_createdat =  request.form.get('created_at')
+            r_updatedat =  request.form.get('updated_at')
             r_upload_image = request.files[name_image]
             
             r_subkategori = self.konversi_ke_id(namatabel='tblsub', value_request=r_subkategori, nama_original_target='sub', nama_id_target='id_sub')
@@ -840,7 +912,7 @@ class server:
         def albumgaleri():
             namatabel = "tbl_album_galeri"
             if request.method == "GET":
-                return jsonify(self.database.SELECT(namatabel=namatabel))
+                return jsonify(self.database.SELECT(namatabel=namatabel, klausa="ORDER BY id_album DESC"))
             else:
                 data = jeroanalbumgaleri()
                 self.database.INSERT(namatabel, data)
@@ -874,18 +946,18 @@ class server:
         
         @self.server.route("/album", methods=["GET"])
         def album():
-            namatabel = "tbl_galeri"
+            namatabel = "tbl_album_galeri"
             if request.method == "GET":
                 return jsonify(self.database.SELECT(namatabel=namatabel))
             
         
         def jeroanvideo():
-            fields = ['url', 'createdat','updatedat']
+            fields = ['url', 'created_at','updated_at']
             self.cek_field(fields)
 
             r_url = request.form.get('url')
-            r_createdat = request.form.get('createdat')
-            r_updatedat = request.form.get('updatedat')
+            r_createdat = request.form.get('created_at')
+            r_updatedat = request.form.get('updated_at')
             
             data = {'url' : r_url, 'created_at' : r_createdat, 'updated_at' : r_updatedat}
             return data
@@ -927,12 +999,12 @@ class server:
         #     return jsonify(self.database.SELECT('tblposbanner'))
          
         def jeroanbanner():
-            fields = ["judul", "keterangan", 'tanggal', "waktu", "status", "jenisiklan" ,"posisi", "createdat", "updatedat"]
+            fields = ["judul", "keterangan", 'tanggal', "waktu", "status", "status2" ,"posbanner", "created_at", "updated_at"]
             name_image = "fotobanner"
             self.cek_field(fields)
             self.cek_image(name_image)
 
-            r_judul = request.form.get("judul"); r_keterangan = request.form.get("keterangan"); r_tanggal = request.form.get("tanggal"); r_waktu = request.form.get("waktu"); r_status = request.form.get("status"); r_jenisiklan = request.form.get("jenisiklan"); r_posisi = request.form.get("posisi"); r_fotobanner = request.files[name_image]; r_createdat = request.form.get("createdat"); r_updatedat = request.form.get("updatedat")
+            r_judul = request.form.get("judul"); r_keterangan = request.form.get("keterangan"); r_tanggal = request.form.get("tanggal"); r_waktu = request.form.get("waktu"); r_status = request.form.get("status"); r_jenisiklan = request.form.get("status2"); r_posisi = request.form.get("posbanner"); r_fotobanner = request.files[name_image]; r_createdat = request.form.get("created_at"); r_updatedat = request.form.get("updated_at")
 
             r_posisi = self.konversi_ke_id(namatabel="tblposbanner", value_request= r_posisi, nama_original_target='posbanner', nama_id_target='id_posbanner')
                 
@@ -947,7 +1019,7 @@ class server:
             namatabel = "tbl_banner"
             if request.method == 'GET':
                 #     return jsonify(self.database.SELECT(namatabel="tblberita", operasi="JOIN tblkategori ON tblberita.id_kategori = tblkategori.id_kategori",  kondisi=f"permalink = '{kategori}'", klausa="LIMIT 5"))
-                return jsonify(self.database.SELECT(namatabel=namatabel, operasi=f"JOIN tblposbanner ON {namatabel}.id_posbanner = tblposbanner.id_posbanner"))
+                return jsonify(self.database.SELECT(namatabel=namatabel, operasi=f"JOIN tblposbanner ON {namatabel}.id_posbanner = tblposbanner.id_posbanner", klausa="ORDER BY id_banner DESC", kondisi="status = 'Y'"))
             else:
                 data = jeroanbanner()
                 self.database.INSERT(namatabel, data)
@@ -971,9 +1043,9 @@ class server:
     
 
         def jeroanusers():
-            fields = ['username', 'password', 'namapengguna', 'status', 'createdat', 'updatedat']
+            fields = ['username', 'password', 'nama_pengguna', 'status', 'created_at', 'updated_at']
             self.cek_field(fields)
-            r_username = request.form.get('username');r_password = request.form.get('password');r_namapengguna = request.form.get('namapengguna');r_status = request.form.get('status');r_createdat = request.form.get('createdat');r_updatedat = request.form.get('updatedat')
+            r_username = request.form.get('username');r_password = request.form.get('password');r_namapengguna = request.form.get('nama_pengguna');r_status = request.form.get('status');r_createdat = request.form.get('created_at');r_updatedat = request.form.get('updated_at')
             
             r_password = hashlib.md5(r_password.encode()).hexdigest()
             
@@ -1008,13 +1080,12 @@ class server:
      
      
         def jeroanlog():
-            fields = ['iduserlogin', 'isi', 'createdat', 'updatedat'
-]
+            fields = ['id_user_login', 'isi', 'created_at', 'updated_at']
             self.cek_field(fields)
             r_iduserlogin = request.form.get('iduserlogin')
             r_isi = request.form.get('isi')
-            r_createdat = request.form.get('createdat')
-            r_updatedat = request.form.get('updatedat')
+            r_createdat = request.form.get('created_at')
+            r_updatedat = request.form.get('updated_at')
             data = {'id_user_login' : r_iduserlogin, 'isi' : r_isi, 'created_at' : r_createdat, 'updated_at' : r_updatedat}
             return data
      
@@ -1075,9 +1146,9 @@ class server:
         
         
         
-        @self.server.route("/foto/banner/original/<nama_file>", methods=["GET"])
+        @self.server.route("/foto/banner/<nama_file>", methods=["GET"])
         def foto_banner(nama_file):
-            return send_from_directory('assets/banner/original', nama_file)
+            return send_from_directory('assets/banner', nama_file)
         
         @self.server.route("/foto/berita/large/<nama_file>", methods=["GET"])
         def foto_berita_large(nama_file):
@@ -1087,9 +1158,9 @@ class server:
         def foto_berita_original(nama_file):
             return send_from_directory('assets/berita/original', nama_file)
         
-        @self.server.route("/foto/galeri/original/<nama_file>", methods=["GET"])
+        @self.server.route("/foto/galeri/<nama_file>", methods=["GET"])
         def foto_galeri(nama_file):
-            return send_from_directory('assets/galeri/original', nama_file)
+            return send_from_directory('assets/galeri', nama_file)
         
         # @self.server.route("/foto/video/large/<nama_file>", methods=["GET"])
         # def foto_video_large(nama_file):

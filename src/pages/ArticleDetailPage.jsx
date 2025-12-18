@@ -8,6 +8,59 @@ import {
 } from "../services/api";
 import ContentBottomSections from "../components/ContentBottomSections";
 
+// Function to extract article IDs from "Baca juga" links in content
+const extractBacaJugaLinks = (htmlContent) => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, "text/html");
+
+    // Find all links that might be "Baca juga" links
+    const links = doc.querySelectorAll('a[href*="/article/"]');
+    const bacaJugaLinks = [];
+
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      // Extract article ID from URL pattern: /article/{id}/{slug}
+      const match = href.match(/\/article\/(\d+)/);
+      if (match && match[1]) {
+        bacaJugaLinks.push({
+          id: match[1],
+          title: link.textContent.trim(),
+          url: href,
+          element: link,
+        });
+      }
+    });
+
+    return bacaJugaLinks;
+  } catch (error) {
+    console.error("Error extracting Baca Juga links:", error);
+    return [];
+  }
+};
+
+// Function to fetch article data for Baca Juga links
+const extractAndFetchBacaJugaArticles = async (htmlContent) => {
+  const links = extractBacaJugaLinks(htmlContent);
+  if (links.length === 0) return [];
+
+  try {
+    // Fetch article data for each link
+    const articlePromises = links.map((link) =>
+      fetchArticleById(link.id).catch((err) => {
+        console.warn(`Failed to fetch article ${link.id}:`, err);
+        return null;
+      })
+    );
+
+    const articles = await Promise.all(articlePromises);
+    return articles.filter((article) => article !== null);
+  } catch (error) {
+    console.error("Error fetching Baca Juga articles:", error);
+    return [];
+  }
+};
+
 function ArticleDetailPage() {
   const { id, type } = useParams();
   const navigate = useNavigate();
@@ -41,7 +94,15 @@ function ArticleDetailPage() {
             try {
               const related = await fetchRelatedArticles(articleData.id, 5);
               setRelatedArticles(related.slice(0, 3));
-              setBacaJugaArticles(related.slice(0, 2));
+              // Extract "Baca Juga" links from content and fetch their data
+              if (articleData.isi) {
+                const bacaJugaData = await extractAndFetchBacaJugaArticles(
+                  articleData.isi
+                );
+                setBacaJugaArticles(bacaJugaData);
+              } else {
+                setBacaJugaArticles([]);
+              }
             } catch (headlineError) {
               console.warn("Could not load related articles:", headlineError);
               setRelatedArticles([]);
@@ -451,83 +512,125 @@ function ArticleDetailPage() {
 
 // Component to render article content with Baca Juga section in the middle
 function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
-  // Split content roughly in half based on paragraphs
-  const { firstHalf, secondHalf } = useMemo(() => {
-    if (!content) return { firstHalf: "", secondHalf: "" };
+  // Parse content and split it where "Baca juga" links appear
+  const contentSections = useMemo(() => {
+    if (!content) return [];
 
     try {
-      // Split by paragraphs (p tags)
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, "text/html");
-      const paragraphs = Array.from(
-        doc.querySelectorAll(
-          "p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, img"
-        )
-      );
 
-      // Find middle point
-      const midPoint = Math.floor(paragraphs.length / 2);
+      // Find all "Baca juga" paragraphs (containing <strong>Baca juga:</strong>)
+      const allElements = Array.from(doc.body.children);
+      const sections = [];
+      let currentSection = [];
 
-      if (paragraphs.length < 3) {
-        // If too short, don't split
-        return { firstHalf: content, secondHalf: "" };
+      allElements.forEach((element, index) => {
+        const html = element.outerHTML.toLowerCase();
+
+        // Check if this element contains "baca juga" link
+        if (
+          html.includes("baca juga") &&
+          element.querySelector('a[href*="/article/"]')
+        ) {
+          // Save current section before the "Baca juga"
+          if (currentSection.length > 0) {
+            sections.push({
+              type: "content",
+              html: currentSection.map((el) => el.outerHTML).join(""),
+            });
+            currentSection = [];
+          }
+
+          // Mark this as a "Baca juga" section
+          const link = element.querySelector('a[href*="/article/"]');
+          const href = link ? link.getAttribute("href") : "";
+          const match = href.match(/\/article\/(\d+)/);
+
+          sections.push({
+            type: "bacajuga",
+            articleId: match ? match[1] : null,
+          });
+
+          // Don't add the paragraph itself to current section
+        } else {
+          currentSection.push(element);
+        }
+      });
+
+      // Add remaining content
+      if (currentSection.length > 0) {
+        sections.push({
+          type: "content",
+          html: currentSection.map((el) => el.outerHTML).join(""),
+        });
       }
 
-      // Split paragraphs
-      const firstParagraphs = paragraphs.slice(0, midPoint);
-      const secondParagraphs = paragraphs.slice(midPoint);
-
-      const firstHalf = firstParagraphs.map((p) => p.outerHTML).join("");
-      const secondHalf = secondParagraphs.map((p) => p.outerHTML).join("");
-
-      return { firstHalf, secondHalf };
+      return sections;
     } catch (error) {
-      console.error("Error splitting content:", error);
-      // If parsing fails, return the full content without splitting
-      return { firstHalf: content, secondHalf: "" };
+      console.error("Error parsing content:", error);
+      return [{ type: "content", html: content }];
     }
   }, [content]);
 
+  // Map article IDs to article data
+  const articleMap = useMemo(() => {
+    const map = {};
+    bacaJugaArticles.forEach((article) => {
+      map[article.id_berita || article.id] = article;
+    });
+    return map;
+  }, [bacaJugaArticles]);
+
   return (
     <>
-      {/* First half of content */}
-      <div
-        className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: firstHalf }}
-      ></div>
+      {contentSections.map((section, index) => {
+        if (section.type === "content") {
+          return (
+            <div
+              key={index}
+              className="prose max-w-none -mb-6"
+              dangerouslySetInnerHTML={{ __html: section.html }}
+            />
+          );
+        } else if (section.type === "bacajuga" && section.articleId) {
+          const article = articleMap[section.articleId];
 
-      {/* Baca Juga Section in the middle */}
-      {bacaJugaArticles && bacaJugaArticles.length > 0 && (
-        <div className="my-8 bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-[#EE4339] rounded-lg p-6 shadow-md">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-6 h-6 text-[#EE4339]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          if (!article) return null;
+
+          return (
+            <div
+              key={index}
+              className="my-3 bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-[#EE4339] rounded-lg p-6 shadow-md"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
-            <h3 className="text-xl font-bold text-gray-800">Baca Juga</h3>
-          </div>
+              <div className="flex items-center gap-2 mb-4">
+                <svg
+                  className="w-6 h-6 text-[#EE4339]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                <h3 className="text-xl font-bold text-gray-800">Baca Juga</h3>
+              </div>
 
-          <div className="space-y-4">
-            {bacaJugaArticles.map((article, index) => (
               <div
-                key={article.id}
-                onClick={() => onNavigate(article.id, article.url)}
+                onClick={() =>
+                  onNavigate(article.id_berita || article.id, article.url)
+                }
                 className="flex gap-4 bg-white rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
               >
                 {/* Article Image */}
                 <div className="shrink-0">
                   <img
                     src={article.gambar}
-                    alt={article.judul}
+                    alt={article.judul_berita || article.judul}
                     className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg group-hover:opacity-90 transition"
                     onError={(e) => {
                       e.target.src = "/image.png";
@@ -539,32 +642,26 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-semibold text-white bg-[#EE4339] px-2 py-1 rounded">
-                      {article.tag}
+                      {article.nama_kategori || article.tag}
                     </span>
                     <span className="text-xs text-gray-500">
                       {article.tanggal}
                     </span>
                   </div>
                   <h4 className="font-bold text-gray-800 line-clamp-2 group-hover:text-[#EE4339] transition">
-                    {article.judul}
+                    {article.judul_berita || article.judul}
                   </h4>
                   <p className="text-sm text-gray-600 mt-2 line-clamp-2 hidden md:block">
                     {article.description}
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+          );
+        }
 
-      {/* Second half of content */}
-      {secondHalf && (
-        <div
-          className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: secondHalf }}
-        ></div>
-      )}
+        return null;
+      })}
     </>
   );
 }

@@ -66,7 +66,7 @@ function HomePage() {
         // Critical content first
         try {
           const headlinesData = await fetchHeadlines();
-          setHeadlines(headlinesData);
+          setHeadlines(headlinesData.articles || headlinesData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching headlines:", err);
@@ -74,7 +74,7 @@ function HomePage() {
 
         try {
           const pilihanEditorData = await fetchPilihanEditor();
-          setPilihanEditor(pilihanEditorData);
+          setPilihanEditor(pilihanEditorData.articles || pilihanEditorData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching pilihan editor:", err);
@@ -82,7 +82,7 @@ function HomePage() {
 
         try {
           const beritaTerkiniData = await fetchBeritaTerkini();
-          setBeritaTerkini(beritaTerkiniData);
+          setBeritaTerkini(beritaTerkiniData.articles || beritaTerkiniData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching berita terkini:", err);
@@ -94,7 +94,7 @@ function HomePage() {
         // Continue loading remaining sections with delays
         try {
           const terpopulerData = await fetchTerpopuler();
-          setTerpopuler(terpopulerData);
+          setTerpopuler(terpopulerData.articles || terpopulerData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching terpopuler:", err);
@@ -102,7 +102,7 @@ function HomePage() {
 
         try {
           const gagasanData = await fetchGagasan();
-          setGagasan(gagasanData);
+          setGagasan(gagasanData.articles || gagasanData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching gagasan:", err);
@@ -110,7 +110,7 @@ function HomePage() {
 
         try {
           const riauData = await fetchRiau();
-          setRiau(riauData);
+          setRiau(riauData.articles || riauData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching riau:", err);
@@ -118,7 +118,7 @@ function HomePage() {
 
         try {
           const nasionalData = await fetchNasional();
-          setNasional(nasionalData);
+          setNasional(nasionalData.articles || nasionalData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching nasional:", err);
@@ -126,7 +126,7 @@ function HomePage() {
 
         try {
           const tipsKesehatanData = await fetchTipsKesehatan();
-          setTipsKesehatan(tipsKesehatanData);
+          setTipsKesehatan(tipsKesehatanData.articles || tipsKesehatanData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching tips kesehatan:", err);
@@ -134,7 +134,7 @@ function HomePage() {
 
         try {
           const advertorialData = await fetchAdvertorial();
-          setAdvertorial(advertorialData);
+          setAdvertorial(advertorialData.articles || advertorialData);
           await delay(300);
         } catch (err) {
           console.error("Error fetching advertorial:", err);
@@ -142,7 +142,7 @@ function HomePage() {
 
         try {
           const galeriData = await fetchGaleri();
-          setGaleri(galeriData);
+          setGaleri(galeriData.articles || galeriData);
         } catch (err) {
           console.error("Error fetching galeri:", err);
         }

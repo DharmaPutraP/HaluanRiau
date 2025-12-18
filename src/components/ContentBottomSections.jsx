@@ -50,11 +50,11 @@ function ContentBottomSections() {
           fetchAdvertorial(),
           fetchGaleri(),
         ]);
-        setRiau(riauData);
-        setNasional(nasionalData);
-        setTipsKesehatan(tipsKesehatanData);
-        setAdvertorial(advertorialData);
-        setGaleri(galeriData);
+        setRiau(riauData.articles || riauData);
+        setNasional(nasionalData.articles || nasionalData);
+        setTipsKesehatan(tipsKesehatanData.articles || tipsKesehatanData);
+        setAdvertorial(advertorialData.articles || advertorialData);
+        setGaleri(galeriData.articles || galeriData);
       } catch (err) {
         console.error("Error fetching sections:", err);
       }

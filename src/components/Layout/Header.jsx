@@ -28,11 +28,11 @@ function Header() {
         isVisible ? "opacity-100 h-5 py-2" : "opacity-0 h-0 py-0"
       }`}
     >
-      <a href="tentang-kami">TENTANG KAMI</a>
-      <a href="redaksi">REDAKSI</a>
-      <a href="pedoman">PEDOMAN</a>
-      <a href="disclaimer">DISCLAIMER</a>
-      <a href="kontak">KONTAK</a>
+      <a href="/tentang-kami">TENTANG KAMI</a>
+      <a href="/redaksi">REDAKSI</a>
+      <a href="/pedoman">PEDOMAN</a>
+      <a href="/disclaimer">DISCLAIMER</a>
+      <a href="/kontak">KONTAK</a>
     </div>
   );
 }

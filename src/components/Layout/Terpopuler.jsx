@@ -17,10 +17,10 @@ function Terpopuler({ data = [] }) {
     loadBanner();
   }, []);
 
-  const topFive = data.slice(0, 4);
-  // Split: first 2 and remaining 2
+  const topFive = banner ? data.slice(0, 4) : data.slice(0, 5);
+  // Split: first 2 and remaining (2 if banner, 3 if no banner)
   const firstTwo = topFive.slice(0, 2);
-  const lastTwo = topFive.slice(2);
+  const remaining = topFive.slice(2);
 
   return (
     <>
@@ -63,7 +63,7 @@ function Terpopuler({ data = [] }) {
           </a>
         ))}
 
-        {/* Banner in the middle */}
+        {/* Banner in the middle (only if banner exists) */}
         {banner && banner.image && (
           <div className="my-4">
             <img
@@ -75,8 +75,8 @@ function Terpopuler({ data = [] }) {
           </div>
         )}
 
-        {/* Last 2 items */}
-        {lastTwo.map((item, index) => (
+        {/* Remaining items (2 if banner, 3 if no banner) */}
+        {remaining.map((item, index) => (
           <a
             key={index + 2}
             href={`/article/${item.id}/${item.url || item.id}`}

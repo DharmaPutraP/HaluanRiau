@@ -87,50 +87,34 @@ function Footer() {
           <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">KANAL</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/category/lokal" className="hover:text-[#EE4339]">
                 LOKAL
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/category/nasional" className="hover:text-[#EE4339]">
                 NASIONAL
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/category/politik" className="hover:text-[#EE4339]">
                 POLITIK
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/category/ekonomi" className="hover:text-[#EE4339]">
                 EKONOMI
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
-                KRIMINAL
+              <a href="/category/olahraga" className="hover:text-[#EE4339]">
+                OLAHRAGA
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-[#EE4339]">
+              <a href="/category/teknologi" className="hover:text-[#EE4339]">
                 TEKNOLOGI
               </a>
-            </li>
-            <li>
-              <button className="hover:text-[#EE4339] flex items-center">
-                MORE
-                <svg
-                  className="w-4 h-4 ml-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
             </li>
           </ul>
         </div>

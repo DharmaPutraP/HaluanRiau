@@ -198,6 +198,45 @@ function Navbar() {
                 >
                   OLAHRAGA
                 </a>
+                {/* DAERAH Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => toggleDropdown("daerah")}
+                    className="text-sm font-medium hover:text-gray-200 flex items-center space-x-1"
+                  >
+                    <span>DAERAH</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${
+                        openDropdown === "daerah" ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {openDropdown === "daerah" && (
+                    <div className="absolute top-full left-0 mt-2 bg-white text-gray-800 rounded shadow-lg py-2 min-w-[150px] z-50">
+                      {DAERAH.map((item, index) => (
+                        <a
+                          key={index}
+                          href={`/category/${item
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
+                          className="block px-4 py-2 hover:bg-gray-100 capitalize"
+                        >
+                          {item}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* LAINNYA Dropdown */}
                 <div className="relative">
@@ -230,46 +269,6 @@ function Navbar() {
                           href={`/category/${item
                             .toLowerCase()
                             .replace(/[\s&]+/g, "-")}`}
-                          className="block px-4 py-2 hover:bg-gray-100 capitalize"
-                        >
-                          {item}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* DAERAH Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => toggleDropdown("daerah")}
-                    className="text-sm font-medium hover:text-gray-200 flex items-center space-x-1"
-                  >
-                    <span>DAERAH</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${
-                        openDropdown === "daerah" ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                  {openDropdown === "daerah" && (
-                    <div className="absolute top-full left-0 mt-2 bg-white text-gray-800 rounded shadow-lg py-2 min-w-[150px] z-50">
-                      {DAERAH.map((item, index) => (
-                        <a
-                          key={index}
-                          href={`/category/${item
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
                           className="block px-4 py-2 hover:bg-gray-100 capitalize"
                         >
                           {item}
