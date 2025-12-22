@@ -5,7 +5,7 @@ function Footer() {
         {/* Left Section - Logo and Social Media */}
         <div className="flex flex-col justify-center items-center md:items-start">
           <img
-            src="/Logo.png"
+            src="/logoBesar.png"
             alt="Riau Mandiri Logo"
             className="w-48 md:w-64 mb-4"
           />

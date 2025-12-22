@@ -1,21 +1,58 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { fetchTentangKami } from "../services/api";
 
 function TentangKami() {
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTentangKami = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchTentangKami();
+        console.log("Tentang Kami Content:", data);
+        setPageData(data);
+      } catch (error) {
+        console.error("Error loading Tentang Kami:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTentangKami();
+  }, []);
+
   return (
-    <div className="md:mx-70">
-      <div className="bg-white px-4 md:px-10 py-6 md:py-8 mt-2">
+    <div className="w-full px-2 sm:px-4">
+      <div className="bg-white px-3 sm:px-4 md:px-10 py-4 sm:py-6 md:py-8 mt-2">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : pageData ? (
+          <>
+            <div
+              className="prose prose-sm md:prose-base max-w-none"
+              dangerouslySetInnerHTML={{ __html: pageData.content }}
+            />
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-gray-500">Konten tidak tersedia</p>
+          </div>
+        )}
+
         {/* Header Section */}
-        <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 border-b-4 border-primary pb-3">
+        {/* <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-gray-900 border-b-4 border-primary pb-3">
             Tentang Kami
           </h1>
-          <p className="text-lg md:text-xl font-semibold text-primary mb-2">
+          <p className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">
             Mengabarkan dengan Cepat dan Akurat
           </p>
-        </div>
+        </div> */}
 
         {/* Content Section */}
-        <div className="prose prose-sm md:prose-base max-w-none">
+        {/* <div className="prose prose-sm md:prose-base max-w-none">
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
               <strong className="text-primary text-lg">Riaumandiri.co</strong>{" "}
@@ -206,7 +243,7 @@ function TentangKami() {
               <p className="text-xl font-bold mt-3">Jaya Pers Indonesia!</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

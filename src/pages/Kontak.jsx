@@ -1,17 +1,52 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { fetchKontak } from "../services/api";
 
 function Kontak() {
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadKontak = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchKontak();
+        console.log("Kontak Content:", data);
+        setPageData(data);
+      } catch (error) {
+        console.error("Error loading Kontak:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadKontak();
+  }, []);
+
   return (
-    <div className="md:mx-70">
-      <div className="bg-white px-4 md:px-10 py-6 md:py-8 mt-2">
+    <div className="w-full px-2 sm:px-4 ">
+      <div className="bg-white px-3 sm:px-4 md:px-10 py-4 sm:py-6 md:py-8 mt-2">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : pageData ? (
+          <>
+            <div
+              className="prose prose-sm md:prose-base max-w-none"
+              dangerouslySetInnerHTML={{ __html: pageData.content }}
+            />
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-gray-500">Konten tidak tersedia</p>
+          </div>
+        )}
         {/* Header */}
-        <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 border-b-4 border-primary pb-3">
+        {/* <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-gray-900 border-b-4 border-primary pb-3">
           Hubungi Kami
         </h1>
 
-        {/* Contact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Alamat Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -51,7 +86,6 @@ function Kontak() {
             </div>
           </div>
 
-          {/* Telepon Card */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -83,8 +117,6 @@ function Kontak() {
               </div>
             </div>
           </div>
-
-          {/* Email Card */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -114,8 +146,6 @@ function Kontak() {
               </div>
             </div>
           </div>
-
-          {/* Website Card */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -149,9 +179,7 @@ function Kontak() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Map Section */}
+        </div> */}
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
           <h3 className="font-bold text-xl text-gray-900 mb-4">Lokasi Kami</h3>
           <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">

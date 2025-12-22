@@ -1,17 +1,52 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import { fetchDisclaimer } from "../services/api";
 
 function Disclaimer() {
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDisclaimer = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchDisclaimer();
+        console.log("Disclaimer Content:", data);
+        setPageData(data);
+      } catch (error) {
+        console.error("Error loading Disclaimer:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDisclaimer();
+  }, []);
+
   return (
-    <div className="md:mx-70">
-      <div className="bg-white px-4 md:px-10 py-6 md:py-8 mt-2">
+    <div className="w-full px-2 sm:px-4 ">
+      <div className="bg-white px-3 sm:px-4 md:px-10 py-4 sm:py-6 md:py-8 mt-2">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : pageData ? (
+          <>
+            <div
+              className="prose prose-sm md:prose-base max-w-none"
+              dangerouslySetInnerHTML={{ __html: pageData.content }}
+            />
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-gray-500">Konten tidak tersedia</p>
+          </div>
+        )}
         {/* Header */}
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 border-b-4 border-primary pb-3">
+        {/* <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-gray-900 border-b-4 border-primary pb-3">
           Disclaimer
         </h1>
 
         <div className="prose prose-sm md:prose-base max-w-none">
           <div className="space-y-6 text-gray-700 leading-relaxed">
-            {/* Introduction */}
             <div className="bg-primary/5 border border-primary/20 p-5 rounded-lg">
               <p className="text-gray-800">
                 Seluruh layanan yang diberikan mengikuti aturan main yang
@@ -22,7 +57,6 @@ function Disclaimer() {
               </p>
             </div>
 
-            {/* Main Content */}
             <div className="bg-gray-50 border-l-4 border-primary p-5 rounded-r">
               <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Pasal Sanggahan (Disclaimer)
@@ -67,8 +101,6 @@ function Disclaimer() {
                 </p>
               </div>
             </div>
-
-            {/* Info Box */}
             <div className="bg-primary text-white p-6 rounded-lg">
               <p className="text-center text-sm md:text-base italic">
                 Dengan menggunakan layanan riaumandiri.id, Anda telah menyetujui
@@ -76,7 +108,7 @@ function Disclaimer() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

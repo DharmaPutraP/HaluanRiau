@@ -7,14 +7,14 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://192.168.1.17:81",
+        target: "http://192.168.1.41:81",
         changeOrigin: true,
         rewrite: (path) => {
           return path.replace(/^\/api/, "");
         },
       },
       "/foto": {
-        target: "http://192.168.1.17:81",
+        target: "http://192.168.1.41:81",
         changeOrigin: true,
         rewrite: (path) => path,
       },

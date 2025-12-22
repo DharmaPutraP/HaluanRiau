@@ -89,13 +89,19 @@ function Navbar() {
           }`}
         >
           <a href="/">
-            <img
-              src="/Logo.png"
-              alt="Logo Haluan Riau"
-              className={`transition-all duration-300 ${
-                isScrolled ? "w-40" : "w-3xs"
-              }`}
-            />
+            {isScrolled ? (
+              <img
+                src="/LogoScroll.png"
+                alt="Logo Haluan Riau"
+                className={`transition-all duration-300 w-40 h-auto}`}
+              />
+            ) : (
+              <img
+                src="/logoBesar.png"
+                alt="Logo Haluan Riau"
+                className={`transition-all duration-300 w-3xs`}
+              />
+            )}
           </a>
         </div>
 
@@ -135,7 +141,11 @@ function Navbar() {
 
               {/* Mobile: Center Logo */}
               <div className="md:hidden flex-1 flex justify-center">
-                <img src="/Logo.png" alt="Logo Haluan Riau" className="h-8" />
+                <img
+                  src="/logoBesar.png"
+                  alt="Logo Haluan Riau"
+                  className="h-8"
+                />
               </div>
 
               {/* Mobile: Search Icon */}

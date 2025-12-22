@@ -169,17 +169,19 @@ function HomePage() {
 
   if (loading) {
     return (
-      <div className="md:mx-24">
-        <div className="bg-white px-5 md:px-10 py-16 mt-2 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EE4339] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat berita...</p>
+      <div className="w-full px-2 sm:px-4">
+        <div className="bg-white px-3 sm:px-5 md:px-10 py-12 sm:py-16 mt-2 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#EE4339] mx-auto"></div>
+          <p className="mt-4 text-sm sm:text-base text-gray-600">
+            Memuat berita...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="md:mx-24">
+    <div className="w-full px-2 sm:px-4">
       {headlines.length > 0 ? (
         <Headline data={headlines} />
       ) : (
@@ -228,18 +230,18 @@ function HomePage() {
 
       {/* Banner before Riau section */}
       {banner && (
-        <div className="px-5 md:px-10 py-4 mt-2">
+        <div className="px-2 sm:px-5 md:px-10 py-3 sm:py-4 mt-2">
           <img
             src={banner.image}
             alt={banner.judul}
-            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
             onClick={() => setIsModalOpen(true)}
           />
         </div>
       )}
 
       {riau.length > 0 ? <Riau data={riau} /> : <SectionSkeleton />}
-      <div className="flex flex-col md:grid md:grid-cols-4 gap-2">
+      <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-4 gap-2">
         {nasional.length > 0 ? (
           <MixLayout title="NASIONAL" data={nasional} />
         ) : (

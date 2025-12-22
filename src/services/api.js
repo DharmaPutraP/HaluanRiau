@@ -79,7 +79,7 @@ const fetchByKategori = async (
   endDate = null
 ) => {
   try {
-    let url = `${API_URL}/kategori/${kategori}?halaman=${page}&limit=${limit}`;
+    let url = `${API_URL}/kategori/page/${kategori}?halaman=${page}&limit=${limit}`;
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
@@ -262,7 +262,7 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
       judul_berita: item.nama_album,
       tag: "Galeri",
       tanggal: formatDate(item.tanggal_album, item.waktu || "00:00:00"),
-      description: item.keterangan || "",
+      description: "", // Disabled - keterangan contains unwanted HTML
       gambar: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
       image: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
       foto_kecil: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
@@ -439,7 +439,7 @@ export const fetchByCategory = async (
 
   try {
     // Build URL with optional date filters
-    let url = `${API_URL}/kategori/${category}?halaman=${page}&limit=${limit}`;
+    let url = `${API_URL}/kategori/page/${category}?halaman=${page}&limit=${limit}`;
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
@@ -503,8 +503,8 @@ export const fetchAlbumById = async (id) => {
         albumData.tanggal_album,
         albumData.waktu || "00:00:00"
       ),
-      description: albumData.keterangan || "",
-      isi: albumData.keterangan || "",
+      description: "", // Disabled for listing - keterangan contains unwanted HTML
+      isi: albumData.keterangan || "", // Keep content for detail page
       gambar: albumData.gambar
         ? `/foto/galeri/${albumData.gambar}`
         : "/image.png",
@@ -514,7 +514,7 @@ export const fetchAlbumById = async (id) => {
       foto_kecil: albumData.gambar
         ? `/foto/galeri/${albumData.gambar}`
         : "/image.png",
-      ket_foto: albumData.keterangan || "",
+      ket_foto: "", // Disabled - hide image caption
       counter: albumData.counter || 0,
       timesRead: albumData.counter || 0,
       url: albumData.permalink,
@@ -625,4 +625,55 @@ export const fetchBannersByPosition = async (position) => {
     console.error(`Error fetching banners for position ${position}:`, error);
     return [];
   }
+};
+
+// Fetch static page content
+export const fetchPageContent = async (pageName) => {
+  try {
+    console.log(`📄 Fetching page content for: ${pageName}`);
+    const response = await fetch(`${API_URL}/pages/slug/${pageName}`);
+
+    if (!response.ok) {
+      console.error("❌ Response not OK:", response.status);
+      throw new Error(`Failed to fetch page content for ${pageName}`);
+    }
+
+    const data = await response.json();
+    console.log("📦 Raw page data:", data);
+
+    // Handle both single object and array responses
+    const pageData = Array.isArray(data) ? data[0] : data;
+
+    if (!pageData) {
+      console.error("❌ No page data found");
+      return null;
+    }
+
+    console.log("✅ Fetched page content:", pageData);
+    return pageData;
+  } catch (error) {
+    console.error(`❌ Error fetching page content for ${pageName}:`, error);
+    return null;
+  }
+};
+
+// Specific page content fetchers
+export const fetchTentangKami = async () => {
+  return await fetchPageContent("tentang-kami");
+};
+
+export const fetchRedaksi = async () => {
+  return await fetchPageContent("redaksi");
+};
+
+export const fetchPedoman = async () => {
+  return await fetchPageContent("pedoman-media-siber");
+};
+
+export const fetchDisclaimer = async () => {
+  return await fetchPageContent("disclaimer");
+};
+
+export const fetchKontak = async () => {
+  return await fetchPageContent("kontak");
 };

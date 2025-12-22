@@ -23,7 +23,7 @@ function Headline({ data = [] }) {
 
   // Top 3 for middle (GambarHeadline)
   const middleHeadlines = headlines.slice(0, 3);
-
+  
   // Items 4-5 for left
   const leftHeadlines = headlines.slice(3, 6);
 

@@ -7,7 +7,7 @@ function MainLayout() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="grow">
+      <main className="grow md:mx-20">
         <Outlet />
       </main>
 

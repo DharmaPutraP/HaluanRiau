@@ -1,21 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { fetchRedaksi } from "../services/api";
 
 function Redaksi() {
+  const [pageData, setPageData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadRedaksi = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchRedaksi();
+        console.log("Redaksi Content:", data);
+        setPageData(data);
+      } catch (error) {
+        console.error("Error loading Redaksi:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRedaksi();
+  }, []);
+
   return (
-    <div className="md:mx-70">
-      <div className="bg-white px-4 md:px-10 py-6 md:py-8 mt-2">
+    <div className="w-full px-2 sm:px-4">
+      <div className="bg-white px-3 sm:px-4 md:px-10 py-4 sm:py-6 md:py-8 mt-2">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : pageData ? (
+          <>
+            <div
+              className="prose prose-sm md:prose-base max-w-none"
+              dangerouslySetInnerHTML={{ __html: pageData.content }}
+            />
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-gray-500">Konten tidak tersedia</p>
+          </div>
+        )}
         {/* Header */}
-        <div className="text-center mb-6">
-          <h3 className="text-base md:text-lg text-gray-600 mb-3">
+        {/* <div className="text-center mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-base md:text-lg text-gray-600 mb-2 sm:mb-3">
             SITUS BERITA RIAUMANDIRI.CO DIKELOLA OLEH:
           </h3>
-          <h1 className="text-2xl md:text-3xl font-bold bg-primary text-white py-3 px-6 rounded inline-block">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-primary text-white py-2 sm:py-3 px-4 sm:px-6 rounded inline-block">
             PT. MEDIA RIAU MANDIRI
           </h1>
         </div>
 
         <div className="prose prose-sm md:prose-base max-w-none">
-          {/* Management Section */}
           <div className="bg-gray-50 border-l-4 border-primary p-5 my-6 rounded-r">
             <div className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-[200px_20px_auto] gap-2 items-start">
@@ -47,7 +82,6 @@ function Redaksi() {
             </div>
           </div>
 
-          {/* Editorial Section */}
           <div className="bg-primary/5 border border-primary/20 p-5 my-6 rounded-lg">
             <h3 className="text-xl font-bold text-gray-900 mb-4 border-b-2 border-primary pb-2">
               REDAKSI
@@ -89,7 +123,6 @@ function Redaksi() {
             </div>
           </div>
 
-          {/* Regional Reporters Section */}
           <div className="bg-gray-50 border-l-4 border-primary p-5 my-6 rounded-r">
             <h3 className="text-xl font-bold text-gray-900 mb-4 border-b-2 border-primary pb-2">
               REPORTER DAERAH
@@ -190,7 +223,6 @@ function Redaksi() {
             </div>
           </div>
 
-          {/* Non-Editorial Section */}
           <div className="bg-primary/5 border border-primary/20 p-5 my-6 rounded-lg">
             <h3 className="text-xl font-bold text-gray-900 mb-4 border-b-2 border-primary pb-2">
               NON-REDAKSI
@@ -228,7 +260,6 @@ function Redaksi() {
             </div>
           </div>
 
-          {/* Footer Notes */}
           <div className="bg-gray-50 border-t-4 border-primary p-5 my-6 rounded-b-lg">
             <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4">
               Redaksi menerima tulisan yang bersifat umum, tidak menghina, tidak
@@ -251,7 +282,7 @@ function Redaksi() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -148,10 +148,12 @@ function ArticleDetailPage() {
   // If loading
   if (loading) {
     return (
-      <div className="md:mx-24">
-        <div className="bg-white px-5 md:px-10 py-16 mt-2 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat artikel...</p>
+      <div className="w-full px-2 sm:px-4">
+        <div className="bg-white px-3 sm:px-5 md:px-10 py-12 sm:py-16 mt-2 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-sm sm:text-base text-gray-600">
+            Memuat artikel...
+          </p>
         </div>
       </div>
     );
@@ -160,15 +162,17 @@ function ArticleDetailPage() {
   // If article not found, show error
   if (!article) {
     return (
-      <div className="md:mx-24">
-        <div className="bg-white px-5 md:px-10 py-16 mt-2 text-center">
-          <h1 className="text-3xl font-bold mb-4">Artikel Tidak Ditemukan</h1>
-          <p className="text-gray-600 mb-6">
+      <div className="w-full px-2 sm:px-4">
+        <div className="bg-white px-3 sm:px-5 md:px-10 py-12 sm:py-16 mt-2 text-center">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">
+            Artikel Tidak Ditemukan
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
             Artikel yang Anda cari tidak tersedia atau telah dihapus.
           </p>
           <button
             onClick={() => navigate("/")}
-            className="px-6 py-3 bg-[#EE4339] text-white rounded-lg hover:bg-[#d63330]"
+            className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-[#EE4339] text-white rounded-lg hover:bg-[#d63330]"
           >
             Kembali ke Beranda
           </button>
@@ -179,21 +183,21 @@ function ArticleDetailPage() {
 
   return (
     <>
-      <div className="md:mx-70">
-        <div className="bg-white px-4 md:px-10 py-4 md:py-6 mt-2">
+      <div className="w-full px-2 sm:px-4">
+        <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">
           {/* Tag */}
           {/* <div className="mb-3">
           <Tag judul={article.tag} className="text-xs md:text-sm" />
         </div> */}
 
           {/* Article Title */}
-          <h1 className="text-2xl md:text-4xl font-bold mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2">
+          <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2">
             {article.judul_berita}
           </h1>
 
           {/* Article Meta Info */}
           <div className="border-b border-gray-200">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 pb-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm text-gray-600 pb-3 sm:pb-4">
               <div className="flex items-center gap-2">
                 <svg
                   className="w-4 h-4 text-gray-500"
@@ -210,7 +214,7 @@ function ArticleDetailPage() {
                 </svg>
                 <span className="font-medium">{article.tanggal}</span>
               </div>
-              <span className="hidden md:inline">|</span>
+              <span className="hidden sm:inline">|</span>
               <div className="flex items-center gap-2">
                 <svg
                   className="w-4 h-4 text-gray-500"
@@ -230,7 +234,7 @@ function ArticleDetailPage() {
                   {article.reporter || "Redaksi"}
                 </span>
               </div>
-              <span className="hidden md:inline">|</span>
+              <span className="hidden sm:inline">|</span>
               <div className="flex items-center gap-2">
                 <svg
                   className="w-4 h-4 text-gray-500"
@@ -252,7 +256,7 @@ function ArticleDetailPage() {
               </div>
               {article.sumber && (
                 <>
-                  <span className="hidden md:inline">|</span>
+                  <span className="hidden sm:inline">|</span>
                   <div className="flex items-center gap-2">
                     <svg
                       className="w-4 h-4 text-gray-500"
@@ -274,7 +278,7 @@ function ArticleDetailPage() {
                   </div>
                 </>
               )}
-              <span className="hidden md:inline">|</span>
+              <span className="hidden sm:inline">|</span>
               <div className="flex items-center gap-2">
                 <svg
                   className="w-4 h-4 text-gray-500"
@@ -302,10 +306,10 @@ function ArticleDetailPage() {
               </div>
             </div>
             {/* Share Button - Single Icon with Dropdown */}
-            <div className="relative mb-6">
+            <div className="relative mb-4 sm:mb-6">
               <button
                 onClick={() => setIsShareMenuOpen(!isShareMenuOpen)}
-                className="flex items-center gap-2 bg-[#EE4339] text-white px-4 py-2 rounded-lg hover:bg-[#d63330] transition"
+                className="flex items-center gap-2 bg-[#EE4339] text-white px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg hover:bg-[#d63330] transition"
                 aria-label="Share article"
               >
                 <svg
@@ -334,7 +338,7 @@ function ArticleDetailPage() {
                   ></div>
 
                   {/* Menu */}
-                  <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[200px] z-20">
+                  <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[180px] sm:min-w-[200px] z-20">
                     <button
                       onClick={() => {
                         handleShare("facebook");
@@ -434,12 +438,12 @@ function ArticleDetailPage() {
           </div>
 
           {/* Featured Image with Caption */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div className="relative">
               <img
                 src={article.gambar}
                 alt={article.judul}
-                className="w-full mx-auto h-auto rounded-lg"
+                className="w-full mx-auto h-auto rounded-lg shadow-md"
                 onError={(e) => {
                   e.target.src = "/image.png";
                 }}
@@ -447,7 +451,7 @@ function ArticleDetailPage() {
             </div>
             {/* Image Caption */}
             {article.ket_foto && (
-              <p className="text-xs md:text-sm text-gray-500 italic mt-2 text-center">
+              <p className="text-xs sm:text-sm text-gray-500 italic mt-2 text-center px-2">
                 {article.ket_foto}
               </p>
             )}
@@ -464,38 +468,44 @@ function ArticleDetailPage() {
           />
 
           {/* Tags Section */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">Tags:</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">
+                Kategori:
+              </span>
               <Tag judul={article.nama_kategori} className="text-xs" />
             </div>
           </div>
 
           {/* Related Articles - Only show if there are articles */}
           {relatedArticles && relatedArticles.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-300">
-              <h3 className="font-bold text-xl mb-4">Berita Terkait</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {relatedArticles.slice(0, 3).map((item) => (
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-300">
+              <h3 className="font-bold text-lg sm:text-xl mb-3 sm:mb-4">
+                Berita Terkait
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                {relatedArticles.slice(0, 1).map((item) => (
                   <div
                     key={item.id}
                     onClick={() =>
                       navigate(`/article/${item.id}/${item.url || item.id}`)
                     }
-                    className="cursor-pointer hover:shadow-lg transition"
+                    className="cursor-pointer hover:shadow-lg transition p-2"
                   >
                     <img
                       src={item.gambar}
                       alt={item.judul}
-                      className="w-full h-40 object-cover rounded"
+                      className="w-full h-32 sm:h-36 md:h-40 object-cover rounded"
                       onError={(e) => {
                         e.target.src = "/image.png";
                       }}
                     />
-                    <h4 className="font-bold mt-2 line-clamp-2">
+                    <h4 className="font-bold text-sm sm:text-base mt-2 line-clamp-2">
                       {item.judul}
                     </h4>
-                    <p className="text-sm text-gray-500 mt-1">{item.tanggal}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                      {item.tanggal}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -503,7 +513,7 @@ function ArticleDetailPage() {
           )}
         </div>
       </div>
-      <div className="md:mx-24">
+      <div className="w-full px-2 sm:px-4">
         <ContentBottomSections />
       </div>
     </>
@@ -601,11 +611,11 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
           return (
             <div
               key={index}
-              className="my-3 bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-[#EE4339] rounded-lg p-6 shadow-md"
+              className="my-3 sm:my-4 bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-[#EE4339] rounded-lg p-3 sm:p-4 md:p-6 shadow-md"
             >
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <svg
-                  className="w-6 h-6 text-[#EE4339]"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-[#EE4339]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -617,21 +627,23 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
-                <h3 className="text-xl font-bold text-gray-800">Baca Juga</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                  Baca Juga
+                </h3>
               </div>
 
               <div
                 onClick={() =>
                   onNavigate(article.id_berita || article.id, article.url)
                 }
-                className="flex gap-4 bg-white rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-white rounded-lg p-3 sm:p-4 cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
               >
                 {/* Article Image */}
-                <div className="shrink-0">
+                <div className="shrink-0 w-full sm:w-auto">
                   <img
                     src={article.gambar}
                     alt={article.judul_berita || article.judul}
-                    className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg group-hover:opacity-90 transition"
+                    className="w-full sm:w-24 sm:h-24 md:w-32 md:h-32 h-48 object-cover rounded-lg group-hover:opacity-90 transition"
                     onError={(e) => {
                       e.target.src = "/image.png";
                     }}
@@ -640,7 +652,7 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
 
                 {/* Article Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="text-xs font-semibold text-white bg-[#EE4339] px-2 py-1 rounded">
                       {article.nama_kategori || article.tag}
                     </span>
@@ -648,10 +660,10 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
                       {article.tanggal}
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-800 line-clamp-2 group-hover:text-[#EE4339] transition">
+                  <h4 className="font-bold text-sm sm:text-base text-gray-800 line-clamp-2 group-hover:text-[#EE4339] transition">
                     {article.judul_berita || article.judul}
                   </h4>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2 hidden md:block">
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2 hidden sm:block">
                     {article.description}
                   </p>
                 </div>

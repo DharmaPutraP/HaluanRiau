@@ -49,13 +49,15 @@ function VideoListPage() {
   const hasMore = visibleCount < allVideos.length;
 
   return (
-    <div className="md:mx-24">
-      <div className="bg-white px-4 md:px-10 py-4 md:py-6 mt-2">
+    <div className="w-full px-2 sm:px-4">
+      <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">
         {/* Page Title */}
-        <div className="mb-4 md:mb-6 flex gap-2 md:gap-3 border-b-4 border-[#EE4339]">
-          <h1 className="text-lg md:text-2xl font-bold pb-2">INDEX VIDEO</h1>
+        <div className="mb-3 sm:mb-4 md:mb-6 flex gap-2 md:gap-3 border-b-4 border-[#EE4339]">
+          <h1 className="text-base sm:text-lg md:text-2xl font-bold pb-2">
+            INDEX VIDEO
+          </h1>
           <svg
-            className="w-5 h-5 md:w-8 md:h-8"
+            className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8"
             viewBox="0 0 24 24"
             fill="none"
             stroke="#000000"
@@ -67,14 +69,14 @@ function VideoListPage() {
         </div>
 
         {/* Videos Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {visibleVideos.map((video) => (
             <a
               key={video.id}
               href={video.tiktokUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 p-1 h-[280px] sm:h-[400px] md:h-[500px] lg:h-[590px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
+              className="shrink-0 p-1 h-[450px] lg:h-[590px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
             >
               <iframe
                 src={video.embedUrl}
@@ -89,10 +91,10 @@ function VideoListPage() {
 
         {/* Load More Button */}
         {hasMore && (
-          <div className="flex justify-center mt-6 md:mt-8">
+          <div className="flex justify-center mt-4 sm:mt-6 md:mt-8">
             <button
               onClick={handleLoadMore}
-              className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-primary text-white rounded-lg hover:bg-[#d63330] transition font-semibold"
+              className="px-4 sm:px-5 md:px-6 py-2 md:py-3 text-xs sm:text-sm md:text-base bg-primary text-white rounded-lg hover:bg-[#d63330] transition font-semibold"
             >
               Muat Lebih Banyak Video
             </button>
