@@ -46,11 +46,15 @@ function GambarHeadline({ data = [] }) {
         </div>
 
         {/* Slider Dots - Top Right */}
-        <div className="absolute top-4 right-4 flex gap-2 z-10">
+        <div className="absolute top-4 right-4 flex gap-2 z-20">
           {data.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setCurrentSlide(index);
+              }}
               className={`w-2.5 h-2.5 rounded-full transition-all ${
                 currentSlide === index
                   ? "bg-[#EE4339] w-6"
@@ -63,14 +67,17 @@ function GambarHeadline({ data = [] }) {
 
         {/* Overlay with content - Bottom */}
         <div
-          className={`absolute bottom-0 left-0 right-0 bg-linear-to-t bg-black/40 text-white p-4 transition-all duration-300 z-10 ease-in-out ${
+          className={`absolute bottom-0 left-0 right-0 text-white p-3 md:p-4 transition-all duration-300 z-10 ease-in-out ${
             isHovered
-              ? "-translate-y from-[#EE4339] via-[#EE4339]/95 to-transparent"
-              : "translate-y-20 md:translate-y-15"
+              ? "bg-linear-to-t from-[#EE4339] via-[#EE4339]/95 to-transparent md:translate-y-0"
+              : "bg-linear-to-t from-black/80 via-black/60 to-transparent md:translate-y-15"
           }`}
         >
-          <Tag judul={currentItem.tag} className="text-xs backdrop-blur-sm" />
-          <h3 className="text-lg font-bold mt-2 leading-5 line-clamp-2">
+          <Tag
+            judul={currentItem.tag}
+            className="text-[10px] md:text-xs backdrop-blur-sm"
+          />
+          <h3 className="text-base md:text-lg font-bold mt-2 leading-tight md:leading-5 line-clamp-2">
             {currentItem.judul}
           </h3>
 

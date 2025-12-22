@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchDisclaimer } from "../services/api";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 function Disclaimer() {
   const [pageData, setPageData] = useState(null);
@@ -10,10 +11,8 @@ function Disclaimer() {
       try {
         setLoading(true);
         const data = await fetchDisclaimer();
-        console.log("Disclaimer Content:", data);
         setPageData(data);
       } catch (error) {
-        console.error("Error loading Disclaimer:", error);
       } finally {
         setLoading(false);
       }
@@ -32,7 +31,7 @@ function Disclaimer() {
           <>
             <div
               className="prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageData.content }}
+              dangerouslySetInnerHTML={createSanitizedHtml(pageData.content)}
             />
           </>
         ) : (

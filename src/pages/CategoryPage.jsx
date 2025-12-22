@@ -67,7 +67,6 @@ function CategoryPage() {
           }
         }
       } catch (error) {
-        console.error("Error loading category data:", error);
       } finally {
         setLoading(false);
       }
@@ -124,7 +123,6 @@ function CategoryPage() {
     setFilterStartDate(startDate);
     setFilterEndDate(endDate);
     setCurrentPage(1); // Reset to first page when applying filter
-    console.log("Filtering from:", startDate, "to:", endDate);
   };
 
   const handleClearFilter = () => {

@@ -23,7 +23,7 @@ function Headline({ data = [] }) {
 
   // Top 3 for middle (GambarHeadline)
   const middleHeadlines = headlines.slice(0, 3);
-  
+
   // Items 4-5 for left
   const leftHeadlines = headlines.slice(3, 6);
 
@@ -59,34 +59,55 @@ function Headline({ data = [] }) {
         </div>
 
         {/* Mobile: Image on top, headlines below, with banner if available */}
-        <div className="md:hidden flex flex-col gap-4">
+        <div className="md:hidden flex flex-col gap-5">
           <GambarHeadline data={middleHeadlines} />
 
-          {banner && banner.image ? (
-            <>
-              {/* Banner section */}
-              <div className="w-full">
-                <img
-                  src={banner.image}
-                  alt={banner.judul}
-                  className="w-full h-auto object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => setIsModalOpen(true)}
-                />
-              </div>
-
-              {/* Headlines in single column when banner exists */}
-              <div className="flex flex-col gap-3">
-                <LeftHeadline data={leftHeadlines} />
-                <LeftHeadline data={rightHeadlines} />
-              </div>
-            </>
-          ) : (
-            /* 2 columns layout when no banner */
-            <div className="grid grid-cols-1 gap-3">
-              <LeftHeadline data={leftHeadlines} />
-              <LeftHeadline data={rightHeadlines} />
+          {banner && banner.image && (
+            <div className="w-full">
+              <img
+                src={banner.image}
+                alt={banner.judul}
+                className="w-full h-auto object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setIsModalOpen(true)}
+              />
             </div>
           )}
+
+          {/* Headlines in single column */}
+          <div className="flex flex-col gap-3">
+            {[...leftHeadlines, ...rightHeadlines].map((item, index) => (
+              <a
+                key={index}
+                href={`/article/${item.id}/${item.url}`}
+                className={`flex flex-col hover:opacity-80 transition-opacity ${
+                  index < leftHeadlines.length + rightHeadlines.length - 1
+                    ? "pb-3 border-b border-gray-200"
+                    : ""
+                }`}
+              >
+                <span className="inline-block px-2 py-0.5 bg-[#EE4339] text-white text-[10px] font-semibold uppercase w-fit mb-1.5">
+                  {item.tag}
+                </span>
+                <p className="text-base font-bold mb-2 line-clamp-2 leading-snug">
+                  {item.judul}
+                </p>
+                <div className="flex items-center text-[10px] gap-1.5 text-gray-500">
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <p className="truncate">{item.lastUpdated}</p>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 

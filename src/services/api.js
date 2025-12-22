@@ -11,7 +11,7 @@ const formatArticleData = (apiData) => {
     permalink: item.permalink, // Add permalink for category
     sumber: item.sumber,
     tanggal: formatDate(item.tanggal, item.waktu),
-    lastUpdated: formatLastUpdated(item.updated_at),
+    lastUpdated: formatLastUpdated(item.tanggal, item.waktu),
     description: stripHtml(item.isi).substring(0, 200) + "...",
     gambar: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
     image: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
@@ -51,22 +51,37 @@ const formatDate = (date, time) => {
 };
 
 // Format last updated
-const formatLastUpdated = (datetime) => {
-  const dateObj = new Date(datetime);
+const formatLastUpdated = (date, time) => {
+  // Handle both datetime string (from updated_at) and separate date/time
+  let dateObj;
+  if (time) {
+    // If time parameter exists, combine date and time
+    dateObj = new Date(`${date} ${time}`);
+  } else {
+    // Otherwise treat date as a full datetime string
+    dateObj = new Date(date);
+  }
+
   const now = new Date();
   const diffMs = now - dateObj;
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 60) {
+  if (diffMins < 1) {
+    return "Baru saja";
+  } else if (diffMins < 60) {
     return `${diffMins} menit yang lalu`;
   } else if (diffHours < 24) {
     return `${diffHours} jam yang lalu`;
   } else if (diffDays < 7) {
     return `${diffDays} hari yang lalu`;
   } else {
-    return dateObj.toLocaleDateString("id-ID");
+    return dateObj.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   }
 };
 
@@ -83,7 +98,6 @@ const fetchByKategori = async (
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
-    console.log(url);
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Failed to fetch ${kategori}`);
     const responseData = await response.json();
@@ -91,13 +105,6 @@ const fetchByKategori = async (
     // Handle new response format with pagination metadata
     const data = responseData.data || responseData;
     const pagination = responseData.pagination || null;
-
-    console.log(`📂 ${kategori} page ${page} - Got`, data?.length, "articles");
-    if (pagination) {
-      console.log(
-        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
-      );
-    }
 
     const formatted = formatArticleData(data);
 
@@ -107,7 +114,6 @@ const fetchByKategori = async (
       pagination: pagination,
     };
   } catch (error) {
-    console.error(`Error fetching ${kategori}:`, error);
     return { articles: [], pagination: null };
   }
 };
@@ -133,9 +139,6 @@ const fetchBySpecialFilter = async (
     }
 
     const result = await response.json();
-    console.log(
-      `🔥 ${filterName} page ${page} - Got ${result.data?.length || 0} articles`
-    );
 
     const articles = formatArticleData(result.data || []);
     const pagination = result.pagination || null;
@@ -145,7 +148,6 @@ const fetchBySpecialFilter = async (
       pagination: pagination,
     };
   } catch (error) {
-    console.error(`Error fetching ${filterName}:`, error);
     return { articles: [], pagination: null };
   }
 };
@@ -282,7 +284,6 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
       },
     };
   } catch (error) {
-    console.error("Error fetching galeri:", error);
     return { articles: [], pagination: null };
   }
 };
@@ -307,105 +308,61 @@ export const fetchBeritaTerkini = async (
     const data = responseData.data || responseData;
     const pagination = responseData.pagination || null;
 
-    console.log(
-      `🔥 Berita Terkini page ${page} - Got`,
-      data?.length,
-      "articles"
-    );
-    if (pagination) {
-      console.log(
-        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
-      );
-    }
-
     return {
       articles: formatArticleData(data),
       pagination: pagination,
     };
   } catch (error) {
-    console.error("Error fetching berita terkini:", error);
     return { articles: [], pagination: null };
   }
 };
 
 export const fetchArticleById = async (id) => {
   try {
-    console.log(`🔍 Fetching article with ID: ${id}`);
-    console.log(`📡 URL: ${API_URL}/${id}`);
-
     const response = await fetch(`${API_URL}/${id}`);
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
-      console.error(
-        "❌ Response not OK:",
-        response.status,
-        response.statusText
-      );
       throw new Error("Failed to fetch article");
     }
 
     const data = await response.json();
-    console.log("📦 Raw response data:", data);
-    console.log("Is array:", Array.isArray(data));
-    console.log("Data type:", typeof data);
 
     // Handle both single object and array responses
     const articleData = Array.isArray(data) ? data[0] : data;
-    console.log("Article data to format:", articleData);
 
     if (!articleData) {
-      console.error("❌ No article data found");
       return null;
     }
 
     const formatted = formatArticleData([articleData])[0];
-    console.log("✅ Formatted article:", formatted);
 
     return formatted;
   } catch (error) {
-    console.error("❌ Error fetching article:", error);
     return null;
   }
 };
 
 export const fetchArticleByUrl = async (url) => {
   try {
-    console.log(`🔍 Fetching article with URL: ${url}`);
-    console.log(`📡 URL: ${API_URL}/${url}`);
-
     const response = await fetch(`${API_URL}/${url}`);
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
-      console.error(
-        "❌ Response not OK:",
-        response.status,
-        response.statusText
-      );
       throw new Error("Failed to fetch article");
     }
 
     const data = await response.json();
-    console.log("📦 Raw response data:", data);
-    console.log("Is array:", Array.isArray(data));
-    console.log("Data type:", typeof data);
 
     // Handle both single object and array responses
     const articleData = Array.isArray(data) ? data[0] : data;
-    console.log("Article data to format:", articleData);
 
     if (!articleData) {
-      console.error("❌ No article data found");
       return null;
     }
 
     const formatted = formatArticleData([articleData])[0];
-    console.log("✅ Formatted article:", formatted);
 
     return formatted;
   } catch (error) {
-    console.error("❌ Error fetching article:", error);
     return null;
   }
 };
@@ -443,9 +400,6 @@ export const fetchByCategory = async (
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
-    console.log(`🔍 Fetching: ${url}`);
-    console.log(`📅 Date filters: start=${startDate}, end=${endDate}`);
-
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Failed to fetch ${category}`);
     const responseData = await response.json();
@@ -454,19 +408,11 @@ export const fetchByCategory = async (
     const data = responseData.data || responseData;
     const pagination = responseData.pagination || null;
 
-    console.log(`📂 ${category} page ${page} - Got`, data?.length, "articles");
-    if (pagination) {
-      console.log(
-        `📊 Total: ${pagination.totalItems}, Pages: ${pagination.totalPages}`
-      );
-    }
-
     return {
       articles: formatArticleData(data),
       pagination: pagination,
     };
   } catch (error) {
-    console.error(`Error fetching ${category}:`, error);
     return [];
   }
 };
@@ -474,22 +420,18 @@ export const fetchByCategory = async (
 // Fetch album galeri by ID
 export const fetchAlbumById = async (id) => {
   try {
-    console.log(`🔍 Fetching album with ID: ${id}`);
     const response = await fetch(`${API_URL}/albumgaleri/${id}`);
 
     if (!response.ok) {
-      console.error("❌ Response not OK:", response.status);
       throw new Error("Failed to fetch album");
     }
 
     const data = await response.json();
-    console.log("📦 Raw album data:", data);
 
     // Handle both single object and array responses
     const albumData = Array.isArray(data) ? data[0] : data;
 
     if (!albumData) {
-      console.error("❌ No album data found");
       return null;
     }
 
@@ -526,10 +468,8 @@ export const fetchAlbumById = async (id) => {
       permalink: "galeri",
     };
 
-    console.log("✅ Formatted album:", formatted);
     return formatted;
   } catch (error) {
-    console.error("❌ Error fetching album:", error);
     return null;
   }
 };
@@ -537,33 +477,26 @@ export const fetchAlbumById = async (id) => {
 // New function to fetch related articles for "Baca Juga" section
 export const fetchRelatedArticles = async (articleId, limit = 2) => {
   try {
-    console.log(`🔗 Fetching related articles for ID: ${articleId}`);
     const response = await fetch(
       `${API_URL}/artikel/${articleId}/related?limit=${limit}`
     );
     if (!response.ok) throw new Error("Failed to fetch related articles");
     const data = await response.json();
-    console.log(`🔗 Related articles - Got`, data?.length, "articles");
     return formatArticleData(data);
   } catch (error) {
-    console.error("Error fetching related articles:", error);
     return [];
   }
 };
 
 export const fetchSearchResults = async (query) => {
   try {
-    console.log(`🔍 Searching for: ${query}`);
     const response = await fetch(
       `${API_URL}/search/${encodeURIComponent(query)}`
     );
-    console.log(`${API_URL}/search/${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error("Failed to fetch search results");
     const data = await response.json();
-    console.log(`📦 Search results:`, data?.length, "articles");
     return formatArticleData(data);
   } catch (error) {
-    console.error("Error fetching search results:", error);
     return [];
   }
 };
@@ -571,10 +504,12 @@ export const fetchSearchResults = async (query) => {
 // Fetch banners/ads
 export const fetchBanners = async () => {
   try {
-    console.log(`🎯 Fetching banners...`);
     const response = await fetch(`${API_URL}/banner`);
     if (!response.ok) throw new Error("Failed to fetch banners");
-    const data = await response.json();
+    const result = await response.json();
+
+    // Handle both array and object with data property
+    const data = Array.isArray(result) ? result : result.data || [];
 
     // Format banner data
     const formatted = data.map((item) => ({
@@ -598,7 +533,6 @@ export const fetchBanners = async () => {
 
     return formatted;
   } catch (error) {
-    console.error("Error fetching banners:", error);
     return [];
   }
 };
@@ -606,7 +540,6 @@ export const fetchBanners = async () => {
 // Fetch banners by position
 export const fetchBannersByPosition = async (position) => {
   try {
-    console.log(`🎯 Fetching banners for position: ${position}`);
     const banners = await fetchBanners();
 
     // Filter by position permalink or position name
@@ -617,12 +550,8 @@ export const fetchBannersByPosition = async (position) => {
           banner.posbanner.toLowerCase().includes(position.toLowerCase()))
     );
 
-    console.log(
-      `📦 Found ${filtered.length} banner(s) for position: ${position}`
-    );
     return filtered;
   } catch (error) {
-    console.error(`Error fetching banners for position ${position}:`, error);
     return [];
   }
 };
@@ -630,29 +559,23 @@ export const fetchBannersByPosition = async (position) => {
 // Fetch static page content
 export const fetchPageContent = async (pageName) => {
   try {
-    console.log(`📄 Fetching page content for: ${pageName}`);
     const response = await fetch(`${API_URL}/pages/slug/${pageName}`);
 
     if (!response.ok) {
-      console.error("❌ Response not OK:", response.status);
       throw new Error(`Failed to fetch page content for ${pageName}`);
     }
 
     const data = await response.json();
-    console.log("📦 Raw page data:", data);
 
     // Handle both single object and array responses
     const pageData = Array.isArray(data) ? data[0] : data;
 
     if (!pageData) {
-      console.error("❌ No page data found");
       return null;
     }
 
-    console.log("✅ Fetched page content:", pageData);
     return pageData;
   } catch (error) {
-    console.error(`❌ Error fetching page content for ${pageName}:`, error);
     return null;
   }
 };
@@ -676,4 +599,62 @@ export const fetchDisclaimer = async () => {
 
 export const fetchKontak = async () => {
   return await fetchPageContent("kontak");
+};
+
+// Fetch categories from the server
+export const fetchCategories = async () => {
+  try {
+    const response = await fetch(`${API_URL}/kategori`);
+    if (!response.ok) throw new Error("Failed to fetch categories");
+    const data = await response.json();
+
+    // Format categories data
+    const formatted = data.map((item) => ({
+      id: item.id_kategori,
+      nama: item.nama_kategori,
+      permalink: item.permalink,
+      pin: item.pin === 1 || item.pin === true, // Convert to boolean
+      urutan: item.urutan || 0,
+    }));
+
+    // Sort by urutan (order)
+    formatted.sort((a, b) => a.urutan - b.urutan);
+
+    return formatted;
+  } catch (error) {
+    return [];
+  }
+};
+
+// Fetch videos from the server
+export const fetchVideos = async (page = 1, limit = 10) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/video?halaman=${page}&limit=${limit}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch videos");
+    const result = await response.json();
+
+    const data = result.data || [];
+    const pagination = result.pagination || null;
+
+    // Format video data
+    const formatted = data.map((item) => ({
+      id: item.id_video,
+      url: item.url,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      tanggal: formatDate(
+        item.created_at.split(" ")[0],
+        item.created_at.split(" ")[1] || "00:00:00"
+      ),
+    }));
+
+    return {
+      videos: formatted,
+      pagination: pagination,
+    };
+  } catch (error) {
+    return { videos: [], pagination: null };
+  }
 };

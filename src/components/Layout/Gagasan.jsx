@@ -12,7 +12,6 @@ function Gagasan({ data = [] }) {
     const loadBanner = async () => {
       const banners = await fetchBannersByPosition("di gagasan");
       if (banners && banners.length > 0) {
-        console.log("Fetched banners for gagasan:", banners);
         setBanner(banners[0]);
         data = null;
       }

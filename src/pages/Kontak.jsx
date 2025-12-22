@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { fetchKontak } from "../services/api";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 function Kontak() {
   const [pageData, setPageData] = useState(null);
@@ -11,10 +12,8 @@ function Kontak() {
       try {
         setLoading(true);
         const data = await fetchKontak();
-        console.log("Kontak Content:", data);
         setPageData(data);
       } catch (error) {
-        console.error("Error loading Kontak:", error);
       } finally {
         setLoading(false);
       }
@@ -33,7 +32,7 @@ function Kontak() {
           <>
             <div
               className="prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageData.content }}
+              dangerouslySetInnerHTML={createSanitizedHtml(pageData.content)}
             />
           </>
         ) : (

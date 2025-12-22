@@ -27,9 +27,10 @@ export function parseTikTokUrl(url) {
     const videoId = match[2];
 
     return {
-      embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
+      embedUrl: `https://www.tiktok.com/embed/v2/${videoId}?lang=en-US`,
       tiktokUrl: `https://www.tiktok.com/@${username}/video/${videoId}`,
       videoId,
+      username,
     };
   } catch (error) {
     console.error("Error parsing TikTok URL:", error);

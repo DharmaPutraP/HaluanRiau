@@ -7,6 +7,7 @@ import {
   fetchRelatedArticles,
 } from "../services/api";
 import ContentBottomSections from "../components/ContentBottomSections";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 // Function to extract article IDs from "Baca juga" links in content
 const extractBacaJugaLinks = (htmlContent) => {
@@ -34,7 +35,6 @@ const extractBacaJugaLinks = (htmlContent) => {
 
     return bacaJugaLinks;
   } catch (error) {
-    console.error("Error extracting Baca Juga links:", error);
     return [];
   }
 };
@@ -48,7 +48,6 @@ const extractAndFetchBacaJugaArticles = async (htmlContent) => {
     // Fetch article data for each link
     const articlePromises = links.map((link) =>
       fetchArticleById(link.id).catch((err) => {
-        console.warn(`Failed to fetch article ${link.id}:`, err);
         return null;
       })
     );
@@ -56,7 +55,6 @@ const extractAndFetchBacaJugaArticles = async (htmlContent) => {
     const articles = await Promise.all(articlePromises);
     return articles.filter((article) => article !== null);
   } catch (error) {
-    console.error("Error fetching Baca Juga articles:", error);
     return [];
   }
 };
@@ -82,13 +80,8 @@ function ArticleDetailPage() {
         const articleData = isGaleri
           ? await fetchAlbumById(id)
           : await fetchArticleById(id);
-        console.log(
-          `✅ ${isGaleri ? "Album" : "Article"} loaded:`,
-          articleData
-        );
         if (articleData) {
           setArticle(articleData);
-          console.log("✅ Article state set");
           // Only fetch related articles for regular articles, not galeri
           if (!isGaleri) {
             try {
@@ -104,16 +97,12 @@ function ArticleDetailPage() {
                 setBacaJugaArticles([]);
               }
             } catch (headlineError) {
-              console.warn("Could not load related articles:", headlineError);
               setRelatedArticles([]);
               setBacaJugaArticles([]);
             }
           }
-        } else {
-          console.error("❌ No article data returned");
         }
       } catch (error) {
-        console.error("❌ Error loading article:", error);
       } finally {
         setLoading(false);
       }
@@ -478,7 +467,7 @@ function ArticleDetailPage() {
           </div>
 
           {/* Related Articles - Only show if there are articles */}
-          {relatedArticles && relatedArticles.length > 0 && (
+          {/* {relatedArticles && relatedArticles.length > 0 && (
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-300">
               <h3 className="font-bold text-lg sm:text-xl mb-3 sm:mb-4">
                 Berita Terkait
@@ -510,7 +499,7 @@ function ArticleDetailPage() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <div className="w-full px-2 sm:px-4">
@@ -578,7 +567,6 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
 
       return sections;
     } catch (error) {
-      console.error("Error parsing content:", error);
       return [{ type: "content", html: content }];
     }
   }, [content]);
@@ -600,7 +588,7 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
             <div
               key={index}
               className="prose max-w-none -mb-6"
-              dangerouslySetInnerHTML={{ __html: section.html }}
+              dangerouslySetInnerHTML={createSanitizedHtml(section.html)}
             />
           );
         } else if (section.type === "bacajuga" && section.articleId) {

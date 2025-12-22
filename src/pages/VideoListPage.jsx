@@ -1,38 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { parseTikTokUrl } from "../utils/tiktokParser";
+import { fetchVideos } from "../services/api";
 
 function VideoListPage() {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [videoUrls, setVideoUrls] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMorePages, setHasMorePages] = useState(true);
+  const [totalVideos, setTotalVideos] = useState(0);
 
-  // TikTok video share URLs - Add more URLs here
-  const videoInputs = [
-    "https://www.tiktok.com/@haluanriau/video/7582464888761486612?is_from_webapp=1&sender_device=pc&web_id=7582482362174768658",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-  ];
+  // Fetch initial videos
+  useEffect(() => {
+    const loadInitialVideos = async () => {
+      try {
+        setIsLoading(true);
+        const { videos, pagination } = await fetchVideos(1, 12);
+        const urls = videos.map((video) => video.url);
+        setVideoUrls(urls);
+        setTotalVideos(pagination?.totalItems || videos.length);
+        setHasMorePages(
+          pagination ? pagination.currentPage < pagination.totalPages : false
+        );
+      } catch (err) {
+        console.error("Error fetching videos:", err);
+        setVideoUrls([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadInitialVideos();
+  }, []);
 
   // Parse all TikTok URLs
-  const allVideos = videoInputs
+  const allVideos = videoUrls
     .map((input, index) => {
       const parsed = parseTikTokUrl(input);
       return parsed ? { id: index + 1, ...parsed } : null;
@@ -42,11 +43,32 @@ function VideoListPage() {
   // Get visible videos based on current count
   const visibleVideos = allVideos.slice(0, visibleCount);
 
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + 12, allVideos.length));
+  const handleLoadMore = async () => {
+    if (visibleCount < allVideos.length) {
+      // Show more from already loaded videos
+      setVisibleCount((prev) => Math.min(prev + 12, allVideos.length));
+    } else if (hasMorePages) {
+      // Fetch next page from server
+      try {
+        setIsLoading(true);
+        const nextPage = currentPage + 1;
+        const { videos, pagination } = await fetchVideos(nextPage, 12);
+        const newUrls = videos.map((video) => video.url);
+        setVideoUrls((prev) => [...prev, ...newUrls]);
+        setVisibleCount((prev) => prev + newUrls.length);
+        setCurrentPage(nextPage);
+        setHasMorePages(
+          pagination ? pagination.currentPage < pagination.totalPages : false
+        );
+      } catch (err) {
+        console.error("Error loading more videos:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
-  const hasMore = visibleCount < allVideos.length;
+  const hasMore = visibleCount < allVideos.length || hasMorePages;
 
   return (
     <div className="w-full px-2 sm:px-4">
@@ -68,44 +90,68 @@ function VideoListPage() {
           </svg>
         </div>
 
-        {/* Videos Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-          {visibleVideos.map((video) => (
-            <a
-              key={video.id}
-              href={video.tiktokUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 p-1 h-[450px] lg:h-[590px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
-            >
-              <iframe
-                src={video.embedUrl}
-                className="w-full h-full pointer-events-none"
-                allowFullScreen
-                scrolling="no"
-                allow="encrypted-media"
+        {/* Loading State */}
+        {isLoading && videoUrls.length === 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+            {[...Array(12)].map((_, index) => (
+              <div
+                key={`skeleton-${index}`}
+                className="h-[450px] lg:h-[590px] bg-gray-200 rounded-lg animate-pulse"
               />
-            </a>
-          ))}
-        </div>
-
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="flex justify-center mt-4 sm:mt-6 md:mt-8">
-            <button
-              onClick={handleLoadMore}
-              className="px-4 sm:px-5 md:px-6 py-2 md:py-3 text-xs sm:text-sm md:text-base bg-primary text-white rounded-lg hover:bg-[#d63330] transition font-semibold"
-            >
-              Muat Lebih Banyak Video
-            </button>
+            ))}
           </div>
-        )}
+        ) : (
+          <>
+            {/* Videos Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+              {visibleVideos.map((video) => (
+                <div
+                  key={video.id}
+                  className="shrink-0 p-1 h-[450px] lg:h-[590px] bg-black rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow relative"
+                >
+                  <iframe
+                    src={video.embedUrl}
+                    className="w-full h-full"
+                    allowFullScreen
+                    scrolling="no"
+                    allow="encrypted-media;"
+                    frameBorder="0"
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    loading="lazy"
+                  />
+                  <a
+                    href={video.tiktokUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 z-10"
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <span className="sr-only">View on TikTok</span>
+                  </a>
+                </div>
+              ))}
+            </div>
 
-        {/* Show message when all videos loaded */}
-        {!hasMore && allVideos.length > 12 && (
-          <div className="flex justify-center mt-6 md:mt-8 text-sm md:text-base text-gray-600">
-            <p>Semua video telah dimuat</p>
-          </div>
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-4 sm:mt-6 md:mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={isLoading}
+                  className="px-4 sm:px-5 md:px-6 py-2 md:py-3 text-xs sm:text-sm md:text-base bg-primary text-white rounded-lg hover:bg-[#d63330] transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Memuat..." : "Muat Lebih Banyak Video"}
+                </button>
+              </div>
+            )}
+
+            {/* Show message when all videos loaded */}
+            {!hasMore && allVideos.length > 12 && (
+              <div className="flex justify-center mt-6 md:mt-8 text-sm md:text-base text-gray-600">
+                <p>Semua video telah dimuat ({totalVideos} video)</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

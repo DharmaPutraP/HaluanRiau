@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { parseTikTokUrl } from "../../utils/tiktokParser";
-import { fetchBannersByPosition } from "../../services/api";
+import { fetchBannersByPosition, fetchVideos } from "../../services/api";
 import BannerModal from "../BannerModal";
 
 function Video() {
@@ -13,6 +13,9 @@ function Video() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBanner, setSelectedBanner] = useState(null);
+  const [videoUrls, setVideoUrls] = useState([]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(true);
+  const [bannerCount, setBannerCount] = useState(0);
 
   useEffect(() => {
     const loadBanners = async () => {
@@ -22,11 +25,20 @@ function Video() {
           fetchBannersByPosition("video 2"),
           fetchBannersByPosition("video 3"),
         ]);
-        setBanners({
+
+        const loadedBanners = {
           video1: banner1 && banner1.length > 0 ? banner1[0] : null,
           video2: banner2 && banner2.length > 0 ? banner2[0] : null,
           video3: banner3 && banner3.length > 0 ? banner3[0] : null,
-        });
+        };
+
+        setBanners(loadedBanners);
+
+        // Count how many banners exist
+        const count = Object.values(loadedBanners).filter(
+          (banner) => banner !== null
+        ).length;
+        setBannerCount(count);
       } catch (err) {
         console.error("Error fetching video banners:", err);
       }
@@ -34,20 +46,32 @@ function Video() {
     loadBanners();
   }, []);
 
-  // TikTok video share URLs
-  const videoInputs = [
-    "https://www.tiktok.com/@haluanriau/video/7582464888761486612?is_from_webapp=1&sender_device=pc&web_id=7582482362174768658",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-    "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-  ];
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        setIsLoadingVideos(true);
 
-  const videos = videoInputs
-    .slice(0, 7) // Limit to 7 videos
+        // Calculate video count: 7 total items - banner count
+        const videoCount = 7 - bannerCount;
+
+        const { videos } = await fetchVideos(1, videoCount);
+        const urls = videos.map((video) => video.url);
+        setVideoUrls(urls);
+      } catch (err) {
+        console.error("Error fetching videos:", err);
+        setVideoUrls([]); // Fallback to empty array
+      } finally {
+        setIsLoadingVideos(false);
+      }
+    };
+
+    // Only load videos after banners are counted
+    if (bannerCount >= 0) {
+      loadVideos();
+    }
+  }, [bannerCount]);
+
+  const videos = videoUrls
     .map((input, index) => {
       const parsed = parseTikTokUrl(input);
       return parsed ? { id: index + 1, ...parsed } : null;
@@ -172,72 +196,94 @@ function Video() {
           <div className="flex gap-1 border-b-3 w-fit border-primary mb-3 justify-center mx-auto items-center">
             <div className="font-bold text-lg sm:text-xl">VIDEO</div>
           </div>
-          <div
-            ref={scrollContainerRef}
-            onScroll={handleScroll}
-            className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-2 sm:px-4 md:px-10"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {displayItems.map((item, index) => {
-              if (item.type === "banner") {
+
+          {isLoadingVideos ? (
+            // Loading skeleton
+            <div className="flex gap-2 sm:gap-3 md:gap-4 px-2 sm:px-4 md:px-10">
+              {[...Array(5)].map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-gray-200 rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : (
+            <div
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+              className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto scroll-smooth scrollbar-hide px-2 sm:px-4 md:px-10"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {displayItems.map((item, index) => {
+                if (item.type === "banner") {
+                  return (
+                    <div
+                      key={`banner-${item.position}`}
+                      onClick={() => handleBannerClick(item.data)}
+                      className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-xl transition-shadow flex justify-center items-center bg-black"
+                    >
+                      <img
+                        src={item.data.image}
+                        alt={item.data.judul}
+                        className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
+                      />
+                    </div>
+                  );
+                }
                 return (
                   <div
-                    key={`banner-${item.position}`}
-                    onClick={() => handleBannerClick(item.data)}
-                    className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-xl transition-shadow flex justify-center items-center bg-black"
+                    key={item.data.id}
+                    className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-black rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow relative"
                   >
-                    <img
-                      src={item.data.image}
-                      alt={item.data.judul}
-                      className="w-full h-auto object-cover hover:opacity-90 transition-opacity"
+                    <iframe
+                      src={item.data.embedUrl}
+                      className="w-full h-full"
+                      allowFullScreen
+                      scrolling="no"
+                      allow="encrypted-media;"
+                      frameBorder="0"
+                      sandbox="allow-scripts allow-same-origin allow-popups"
+                      loading="lazy"
                     />
+                    <a
+                      href={item.data.tiktokUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-10"
+                      style={{ pointerEvents: "none" }}
+                    >
+                      <span className="sr-only">View on TikTok</span>
+                    </a>
                   </div>
                 );
-              }
-              return (
-                <a
-                  key={item.data.id}
-                  href={item.data.tiktokUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-blue-200 rounded-lg overflow-hidden shadow-md block cursor-pointer hover:shadow-xl transition-shadow"
-                >
-                  <iframe
-                    src={item.data.embedUrl}
-                    className="w-full h-full pointer-events-none"
-                    allowFullScreen
-                    scrolling="no"
-                    allow="encrypted-media"
-                  />
-                </a>
-              );
-            })}
-            {/* See More Link */}
-            <a
-              href="/videos"
-              className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-gradient-to-br from-primary to-primary-dark rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
-            >
-              <svg
-                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 sm:mb-3 md:mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              })}
+              {/* See More Link */}
+              <a
+                href="/videos"
+                className="shrink-0 w-[180px] sm:w-[200px] md:w-60 h-[300px] sm:h-[350px] md:h-[420px] bg-gradient-to-br from-primary to-primary-dark rounded-lg overflow-hidden shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition-all hover:scale-105 text-white"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold">
-                Lihat Semua
-              </span>
-              <span className="text-xs sm:text-sm md:text-base mt-1 sm:mt-2">
-                Video Lainnya
-              </span>
-            </a>
-          </div>
+                <svg
+                  className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 sm:mb-3 md:mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+                <span className="text-lg sm:text-xl md:text-2xl font-bold">
+                  Lihat Semua
+                </span>
+                <span className="text-xs sm:text-sm md:text-base mt-1 sm:mt-2">
+                  Video Lainnya
+                </span>
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Right Arrow Button */}

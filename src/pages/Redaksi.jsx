@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchRedaksi } from "../services/api";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 function Redaksi() {
   const [pageData, setPageData] = useState(null);
@@ -10,10 +11,8 @@ function Redaksi() {
       try {
         setLoading(true);
         const data = await fetchRedaksi();
-        console.log("Redaksi Content:", data);
         setPageData(data);
       } catch (error) {
-        console.error("Error loading Redaksi:", error);
       } finally {
         setLoading(false);
       }
@@ -32,7 +31,7 @@ function Redaksi() {
           <>
             <div
               className="prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageData.content }}
+              dangerouslySetInnerHTML={createSanitizedHtml(pageData.content)}
             />
           </>
         ) : (

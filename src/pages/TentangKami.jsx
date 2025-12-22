@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchTentangKami } from "../services/api";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 function TentangKami() {
   const [pageData, setPageData] = useState(null);
@@ -10,10 +11,8 @@ function TentangKami() {
       try {
         setLoading(true);
         const data = await fetchTentangKami();
-        console.log("Tentang Kami Content:", data);
         setPageData(data);
       } catch (error) {
-        console.error("Error loading Tentang Kami:", error);
       } finally {
         setLoading(false);
       }
@@ -32,7 +31,7 @@ function TentangKami() {
           <>
             <div
               className="prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageData.content }}
+              dangerouslySetInnerHTML={createSanitizedHtml(pageData.content)}
             />
           </>
         ) : (

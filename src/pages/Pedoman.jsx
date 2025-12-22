@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchPedoman } from "../services/api";
+import { createSanitizedHtml } from "../utils/sanitizer";
 
 function Pedoman() {
   const [pageData, setPageData] = useState(null);
@@ -10,10 +11,8 @@ function Pedoman() {
       try {
         setLoading(true);
         const data = await fetchPedoman();
-        console.log("Pedoman Content:", data);
         setPageData(data);
       } catch (error) {
-        console.error("Error loading Pedoman:", error);
       } finally {
         setLoading(false);
       }
@@ -32,7 +31,7 @@ function Pedoman() {
           <>
             <div
               className="prose prose-sm md:prose-base max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageData.content }}
+              dangerouslySetInnerHTML={createSanitizedHtml(pageData.content)}
             />
           </>
         ) : (
