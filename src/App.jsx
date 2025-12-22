@@ -1,6 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
+import { trackPageView } from "./utils/analytics";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
@@ -14,10 +21,22 @@ import Pedoman from "./pages/Pedoman";
 import Disclaimer from "./pages/Disclaimer";
 import Kontak from "./pages/Kontak";
 
+// Component to track page views on route changes
+function RouteTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <RouteTracker />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<MainLayout />}>
