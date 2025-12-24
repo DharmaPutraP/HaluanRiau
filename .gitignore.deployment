@@ -1,0 +1,9 @@
+# .gitignore additions for deployment files
+
+# Deployment archives
+*.tar.gz
+deployment.tar.gz
+dist.tar.gz
+
+# Backup files
+*.backup.*

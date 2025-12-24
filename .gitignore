@@ -26,3 +26,9 @@ dist-ssr
 # Environment Variables
 .env
 .env.production
+
+# Deployment files
+*.tar.gz
+deployment.tar.gz
+dist.tar.gz
+*.backup.*

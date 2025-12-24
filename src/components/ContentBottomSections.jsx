@@ -98,6 +98,7 @@ function ContentBottomSections() {
         onClose={() => setIsModalOpen(false)}
         imageUrl={banner?.image}
         imageAlt={banner?.judul}
+        keterangan={banner?.keterangan}
       />
     </>
   );

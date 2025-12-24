@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Tag from "../components/Tag";
+import Badge from "../components/Badge";
 import {
   fetchArticleById,
   fetchAlbumById,
@@ -172,7 +173,7 @@ function ArticleDetailPage() {
 
   return (
     <>
-      <div className="w-full px-2 sm:px-4">
+      <div className="w-full sm:w-10/12 px-2 sm:px-4 mx-auto">
         <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">
           {/* Tag */}
           {/* <div className="mb-3">
@@ -464,6 +465,7 @@ function ArticleDetailPage() {
               </span>
               <Tag judul={article.nama_kategori} className="text-xs" />
             </div>
+            {/* <Badge /> */}
           </div>
 
           {/* Related Articles - Only show if there are articles */}
@@ -587,7 +589,7 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
           return (
             <div
               key={index}
-              className="prose max-w-none -mb-6"
+              className="prose max-w-none flex flex-col gap-5"
               dangerouslySetInnerHTML={createSanitizedHtml(section.html)}
             />
           );
@@ -651,9 +653,9 @@ function ArticleContentWithBacaJuga({ content, bacaJugaArticles, onNavigate }) {
                   <h4 className="font-bold text-sm sm:text-base text-gray-800 line-clamp-2 group-hover:text-[#EE4339] transition">
                     {article.judul_berita || article.judul}
                   </h4>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2 hidden sm:block">
+                  <div className="text-xs sm:text-sm text-gray-600 mt-2 hidden line-clamp-2 sm:block">
                     {article.description}
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>

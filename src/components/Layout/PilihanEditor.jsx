@@ -35,7 +35,7 @@ function PilihanEditor({ data = [] }) {
           >
             <MenuPilihanEditor
               judul={item.judul}
-              gambar={item.gambar}
+              gambar={item.foto_kecil}
               tanggal={item.tanggal}
               tag={item.tag}
               id={item.id}
@@ -54,7 +54,7 @@ function PilihanEditor({ data = [] }) {
           >
             <MenuPilihanEditor
               judul={item.judul}
-              gambar={item.gambar}
+              gambar={item.foto_kecil}
               tanggal={item.tanggal}
               tag={item.tag}
               id={item.id}

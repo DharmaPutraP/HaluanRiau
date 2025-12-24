@@ -1,4 +1,115 @@
 const API_URL = import.meta.env.VITE_API_URL;
+const API_IMAGE = import.meta.env.VITE_API_IMAGE || "";
+
+// ==================== API CACHING SYSTEM ====================
+// Simple in-memory cache with TTL (Time To Live)
+class APICache {
+  constructor() {
+    this.cache = new Map();
+    this.defaultTTL = 5 * 60 * 1000; // 5 minutes default
+  }
+
+  // Generate cache key from URL and params
+  generateKey(url, params = {}) {
+    const paramString = JSON.stringify(params);
+    return `${url}${paramString}`;
+  }
+
+  // Get cached data if valid
+  get(key) {
+    const cached = this.cache.get(key);
+    if (!cached) return null;
+
+    const now = Date.now();
+    if (now - cached.timestamp > cached.ttl) {
+      // Cache expired, remove it
+      this.cache.delete(key);
+      return null;
+    }
+
+    return cached.data;
+  }
+
+  // Set cache with optional TTL
+  set(key, data, ttl = this.defaultTTL) {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl,
+    });
+  }
+
+  // Clear specific cache or all
+  clear(key = null) {
+    if (key) {
+      this.cache.delete(key);
+    } else {
+      this.cache.clear();
+    }
+  }
+
+  // Get cache stats (for debugging)
+  getStats() {
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys()),
+    };
+  }
+}
+
+// Create cache instance
+const apiCache = new APICache();
+
+// Generic fetch function with caching
+const fetchWithCache = async (url, options = {}) => {
+  const {
+    useCache = true,
+    ttl = 5 * 60 * 1000, // 5 minutes
+    params = {},
+  } = options;
+
+  // Generate cache key
+  const cacheKey = apiCache.generateKey(url, params);
+
+  // Try to get from cache
+  if (useCache) {
+    const cached = apiCache.get(cacheKey);
+    if (cached) {
+      console.log(`📦 Cache hit: ${url}`);
+      return cached;
+    }
+  }
+
+  console.log(`🌐 Fetching: ${url}`);
+
+  // Fetch from API
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    // Store in cache
+    if (useCache) {
+      apiCache.set(cacheKey, data, ttl);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
+  }
+};
+
+// Export cache control functions for manual cache management
+export const cacheControl = {
+  clear: (key) => apiCache.clear(key),
+  clearAll: () => apiCache.clear(),
+  stats: () => apiCache.getStats(),
+};
+
+// ==================== END CACHING SYSTEM ====================
 
 // Helper function to format API data to match our component structure
 const formatArticleData = (apiData) => {
@@ -13,10 +124,14 @@ const formatArticleData = (apiData) => {
     tanggal: formatDate(item.tanggal, item.waktu),
     lastUpdated: formatLastUpdated(item.tanggal, item.waktu),
     description: stripHtml(item.isi).substring(0, 200) + "...",
-    gambar: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
-    image: item.gambar ? `/foto/berita/original/${item.gambar}` : "/image.png",
+    gambar: item.gambar
+      ? `${API_IMAGE}/foto/berita/original/${item.gambar}`
+      : "/image.png",
+    image: item.gambar
+      ? `${API_IMAGE}/foto/berita/original/${item.gambar}`
+      : "/image.png",
     foto_kecil: item.foto_kecil
-      ? `/foto/berita/original/${item.foto_kecil}`
+      ? `${API_IMAGE}/foto/berita/large/${item.foto_kecil}`
       : "/image.png",
     ket_foto: item.ket_foto || "",
     reporter: item.reporter || "Redaksi",
@@ -98,9 +213,12 @@ const fetchByKategori = async (
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Failed to fetch ${kategori}`);
-    const responseData = await response.json();
+    // Use cache with 5 minute TTL
+    const responseData = await fetchWithCache(url, {
+      useCache: true,
+      ttl: 5 * 60 * 1000,
+      params: { kategori, page, limit, startDate, endDate },
+    });
 
     // Handle new response format with pagination metadata
     const data = responseData.data || responseData;
@@ -132,13 +250,12 @@ const fetchBySpecialFilter = async (
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${filterName}`);
-    }
-
-    const result = await response.json();
+    // Use cache with 3 minute TTL for special filters
+    const result = await fetchWithCache(url, {
+      useCache: true,
+      ttl: 3 * 60 * 1000,
+      params: { filterName, filterValue, page, limit, startDate, endDate },
+    });
 
     const articles = formatArticleData(result.data || []);
     const pagination = result.pagination || null;
@@ -265,9 +382,15 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
       tag: "Galeri",
       tanggal: formatDate(item.tanggal_album, item.waktu || "00:00:00"),
       description: "", // Disabled - keterangan contains unwanted HTML
-      gambar: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
-      image: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
-      foto_kecil: item.gambar ? `/foto/galeri/${item.gambar}` : "/image.png",
+      gambar: item.gambar
+        ? `${API_IMAGE}/foto/galeri/${item.gambar}`
+        : "/image.png",
+      image: item.gambar
+        ? `${API_IMAGE}/foto/galeri/${item.gambar}`
+        : "/image.png",
+      foto_kecil: item.gambar
+        ? `${API_IMAGE}/foto/galeri/${item.gambar}`
+        : "/image.png",
       counter: item.counter || 0,
       timesRead: item.counter || 0,
       url: item.permalink,
@@ -300,9 +423,12 @@ export const fetchBeritaTerkini = async (
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch berita terkini");
-    const responseData = await response.json();
+    // Use cache with 2 minute TTL for latest news
+    const responseData = await fetchWithCache(url, {
+      useCache: true,
+      ttl: 2 * 60 * 1000,
+      params: { page, limit, startDate, endDate },
+    });
 
     // Handle new response format with pagination metadata
     const data = responseData.data || responseData;
@@ -319,13 +445,12 @@ export const fetchBeritaTerkini = async (
 
 export const fetchArticleById = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/${id}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch article");
-    }
-
-    const data = await response.json();
+    // Use cache with 10 minute TTL for individual articles
+    const data = await fetchWithCache(`${API_URL}/${id}`, {
+      useCache: true,
+      ttl: 10 * 60 * 1000,
+      params: { id },
+    });
 
     // Handle both single object and array responses
     const articleData = Array.isArray(data) ? data[0] : data;
@@ -448,13 +573,13 @@ export const fetchAlbumById = async (id) => {
       description: "", // Disabled for listing - keterangan contains unwanted HTML
       isi: albumData.keterangan || "", // Keep content for detail page
       gambar: albumData.gambar
-        ? `/foto/galeri/${albumData.gambar}`
+        ? `${API_IMAGE}/foto/galeri/${albumData.gambar}`
         : "/image.png",
       image: albumData.gambar
-        ? `/foto/galeri/${albumData.gambar}`
+        ? `${API_IMAGE}/foto/galeri/${albumData.gambar}`
         : "/image.png",
       foto_kecil: albumData.gambar
-        ? `/foto/galeri/${albumData.gambar}`
+        ? `${API_IMAGE}/foto/galeri/${albumData.gambar}`
         : "/image.png",
       ket_foto: "", // Disabled - hide image caption
       counter: albumData.counter || 0,
@@ -520,9 +645,15 @@ export const fetchBanners = async () => {
       permalink: item.permalink,
       judul: item.judul,
       keterangan: item.keterangan,
-      foto_besar: item.foto_besar ? `/foto/banner/${item.foto_besar}` : null,
-      foto_kecil: item.foto_kecil ? `/foto/banner/${item.foto_kecil}` : null,
-      image: item.foto_besar ? `/foto/banner/${item.foto_besar}` : null,
+      foto_besar: item.foto_besar
+        ? `${API_IMAGE}/foto/banner/${item.foto_besar}`
+        : null,
+      foto_kecil: item.foto_kecil
+        ? `${API_IMAGE}/foto/banner/${item.foto_kecil}`
+        : null,
+      image: item.foto_besar
+        ? `${API_IMAGE}/foto/banner/${item.foto_besar}`
+        : null,
       status: item.status,
       status2: item.status2,
       tanggal: item.tanggal,
@@ -590,7 +721,7 @@ export const fetchRedaksi = async () => {
 };
 
 export const fetchPedoman = async () => {
-  return await fetchPageContent("pedoman-media-siber");
+  return await fetchPageContent("pedoman-media-sibers");
 };
 
 export const fetchDisclaimer = async () => {

@@ -50,7 +50,7 @@ function MixLayout({ title, data = [] }) {
               <BasicArtikel
                 title={item.judul}
                 image={true}
-                imageUrl={item.gambar}
+                imageUrl={item.foto_kecil}
                 date={item.tanggal}
                 id={item.id}
                 url={item.url}
@@ -62,7 +62,7 @@ function MixLayout({ title, data = [] }) {
               <BasicArtikel
                 title={item.judul}
                 image={false}
-                imageUrl={item.gambar}
+                imageUrl={item.foto_kecil}
                 date={item.tanggal}
                 id={item.id}
                 url={item.url}

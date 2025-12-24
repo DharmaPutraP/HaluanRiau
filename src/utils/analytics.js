@@ -27,8 +27,6 @@ export const initGA = () => {
   window.gtag("config", GA_MEASUREMENT_ID, {
     send_page_view: false, // Disable automatic page view, we'll handle it manually
   });
-
-  console.log("Google Analytics initialized:", GA_MEASUREMENT_ID);
 };
 
 /**

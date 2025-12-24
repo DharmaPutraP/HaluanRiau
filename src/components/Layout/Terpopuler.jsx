@@ -96,7 +96,7 @@ function Terpopuler({ data = [] }) {
       {/* Modal for enlarged banner */}
       {isModalOpen && banner?.image && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75 p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-opacity-75 p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <div className="relative max-w-6xl max-h-screen">
@@ -121,6 +121,7 @@ function Terpopuler({ data = [] }) {
         onClose={() => setIsModalOpen(false)}
         imageUrl={banner?.image}
         imageAlt={banner?.judul}
+        keterangan={banner?.keterangan}
       />
     </>
   );

@@ -31,7 +31,7 @@ function SearchPage() {
     return (
       <div className="w-full px-2 sm:px-4">
         <div className="bg-white px-3 sm:px-5 md:px-10 py-12 sm:py-16 mt-2 text-center">
-          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#EE4339] mx-auto"></div>
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-sm sm:text-base text-gray-600">Mencari...</p>
         </div>
       </div>
@@ -42,7 +42,7 @@ function SearchPage() {
     <div className="w-full px-2 sm:px-4">
       <div className="bg-white px-3 sm:px-5 md:px-10 py-4 sm:py-6">
         {/* Header with Search Query */}
-        <div className="mb-4 sm:mb-6 pb-2 border-b-4 border-[#EE4339]">
+        <div className="mb-4 sm:mb-6 pb-2 border-b-4 border-primary">
           <div className="flex items-center gap-2 md:gap-3 pb-2 w-fit flex-wrap">
             <h1 className="text-base sm:text-lg md:text-2xl font-bold break-words">
               HASIL PENCARIAN: "{decodeURIComponent(query)}"

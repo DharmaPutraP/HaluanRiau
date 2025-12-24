@@ -36,7 +36,7 @@ function Riau({ data = [] }) {
             <BasicArtikel
               title={item.judul}
               image={true}
-              imageUrl={item.gambar}
+              imageUrl={item.foto_kecil}
               date={item.tanggal}
               id={item.id}
               url={item.url}
@@ -55,7 +55,7 @@ function Riau({ data = [] }) {
             <BasicArtikel
               title={item.judul}
               image={true}
-              imageUrl={item.gambar}
+              imageUrl={item.foto_kecil}
               date={item.tanggal}
               id={item.id}
               url={item.url}
@@ -64,7 +64,9 @@ function Riau({ data = [] }) {
         ))}
       </div>
       <div className="flex justify-center mt-4">
-        <Button text="Selengkapnya" />
+        <a href="/category/riau">
+          <Button text="Selengkapnya" />
+        </a>
       </div>
     </div>
   );

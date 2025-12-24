@@ -13,6 +13,7 @@ function Headline({ data = [] }) {
       const banners = await fetchBannersByPosition("di headline");
       if (banners && banners.length > 0) {
         setBanner(banners[0]); // Get first banner for this position
+        console.log(banners[0]);
       }
     };
     loadBanner();
@@ -116,6 +117,7 @@ function Headline({ data = [] }) {
         onClose={() => setIsModalOpen(false)}
         imageUrl={banner?.image}
         imageAlt={banner?.judul}
+        keterangan={banner?.keterangan}
       />
     </>
   );

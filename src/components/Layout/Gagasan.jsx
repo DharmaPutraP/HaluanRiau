@@ -78,6 +78,7 @@ function Gagasan({ data = [] }) {
         onClose={() => setIsModalOpen(false)}
         imageUrl={banner?.image}
         imageAlt={banner?.judul}
+        keterangan={banner?.keterangan}
       />
     </>
   );
