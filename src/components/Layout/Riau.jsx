@@ -5,7 +5,7 @@ function Riau({ data = [] }) {
   const topFive = data.slice(0, 5);
   const topSix = data.slice(0, 6);
   return (
-    <div className="bg-white mt-2 px-5 pt-2 pb-5">
+    <div className="bg-white mt-2 md:px-5 pt-2 pb-5">
       <div className="border-b-3 w-fit border-primary mb-3 items-center mx-auto flex gap-2">
         <div className="font-bold text-center">RIAU</div>
         <a
@@ -50,7 +50,9 @@ function Riau({ data = [] }) {
         {topSix.map((item, index) => (
           <div
             key={index}
-            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-1/2 flex`}
+            className={`${
+              index !== 0 && index !== 1 ? "pt-5" : ""
+            } w-1/2 flex px-2`}
           >
             <BasicArtikel
               title={item.judul}

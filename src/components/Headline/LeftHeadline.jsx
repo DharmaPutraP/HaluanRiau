@@ -18,14 +18,14 @@ function LeftHeadline({ data = [] }) {
             judul={item.tag}
             className="text-[10px] md:text-xs mb-1.5 md:mb-2"
           />
-          <p className="text-base md:text-base leading-snug font-bold mb-1 line-clamp-2 grow">
+          <p className="text-base md:text-sm leading-snug font-bold mb-1 grow">
             {item.judul}
           </p>
-          <p className="text-base md:text-sm leading-snug mb-1 line-clamp-1 grow">
+          <p className="text-base md:text-xs leading-snug mb-1 line-clamp-1 grow">
             {item.description}
           </p>
 
-          <div className="flex items-center justify-between align-center">
+          <div className="flex xl:items-center xl:justify-between xl:align-center flex-col xl:flex-row items-start justify-start align-start">
             <div className="flex items-center text-[10px] md:text-xs gap-1.5 text-gray-500">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path

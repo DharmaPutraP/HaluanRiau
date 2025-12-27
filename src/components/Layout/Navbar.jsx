@@ -497,7 +497,7 @@ function Navbar() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header Menu Mobile */}
-              <div className="sticky top-0 bg-gradient-to-r from-[#EE4339] to-[#EE4339]/90 text-white p-4 flex items-center justify-between shadow-md">
+              <div className="sticky top-0 bg-gradient-to-r bg-primary text-white p-4 flex items-center justify-between shadow-md">
                 <div className="flex items-center space-x-3">
                   <svg
                     className="w-6 h-6"

@@ -28,6 +28,7 @@ function CategoryPage() {
     terpopuler: { title: "TERPOPULER" },
     gagasan: { title: "GAGASAN" },
     riau: { title: "RIAU" },
+    zonariau: { title: "RIAU" },
     nasional: { title: "NASIONAL" },
     "tips-kesehatan": { title: "TIPS & KESEHATAN" },
     advertorial: { title: "ADVERTORIAL" },

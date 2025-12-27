@@ -1,4 +1,54 @@
+import { useState, useEffect, useRef } from "react";
+import { fetchCategories } from "../../services/api";
+import { DAERAH } from "../../utils/constants";
+
 function Footer() {
+  const [categories, setCategories] = useState([]);
+  const [overflowCategories, setOverflowCategories] = useState([]);
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const archiveRef = useRef(null);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      const data = await fetchCategories();
+      setCategories(data);
+    };
+    loadCategories();
+  }, []);
+
+  // Calculate overflow categories (non-daerah, unpinned categories)
+  useEffect(() => {
+    if (categories.length === 0) return;
+
+    const nonDaerahCategories = categories.filter(
+      (cat) =>
+        !DAERAH.includes(cat.nama?.toLowerCase() || "") &&
+        !DAERAH.includes(cat.permalink?.toLowerCase() || "")
+    );
+
+    const pinnedCategories = nonDaerahCategories.filter((cat) => cat.pin);
+    const unpinnedCategories = nonDaerahCategories.filter((cat) => !cat.pin);
+
+    // Overflow includes unpinned categories
+    setOverflowCategories(unpinnedCategories);
+  }, [categories]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (archiveRef.current && !archiveRef.current.contains(event.target)) {
+        setIsArchiveOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const getYear = () => {
+    return new Date().getFullYear();
+  };
   return (
     <footer className="bg-white border-t border-gray-300 mt-2">
       {/* Responsive container with proper padding for all screen sizes */}
@@ -62,7 +112,7 @@ function Footer() {
 
             {/* Copyright */}
             <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left max-w-xs">
-              Copyright © 2014-2021 Riaumandiri.co - All Rights Reserved.
+              Copyright © 2014-{getYear()} Riaumandiri.co - All Rights Reserved.
             </p>
           </div>
 
@@ -123,19 +173,48 @@ function Footer() {
             <ul className="space-y-2 sm:space-y-2.5 text-sm sm:text-base text-gray-700">
               <li>
                 <a
-                  href="/category/lokal"
+                  href="/category/zonariau"
                   className="hover:text-[#EE4339] transition-colors duration-200"
                 >
-                  LOKAL
+                  RIAU
                 </a>
               </li>
-              <li>
-                <a
-                  href="/category/nasional"
-                  className="hover:text-[#EE4339] transition-colors duration-200"
+              <li className="relative">
+                <button
+                  onClick={() => setIsArchiveOpen(!isArchiveOpen)}
+                  className="hover:text-[#EE4339] transition-colors duration-200 inline-flex items-center gap-1 justify-center sm:justify-start w-full sm:w-auto"
+                  ref={archiveRef}
                 >
-                  NASIONAL
-                </a>
+                  ARCHIVE
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isArchiveOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {isArchiveOpen && overflowCategories.length > 0 && (
+                  <div className="absolute left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 bottom-full mb-2 bg-white border border-gray-300 rounded shadow-lg py-2 min-w-[180px] z-50 max-h-80 overflow-y-auto">
+                    {overflowCategories.map((category) => (
+                      <a
+                        key={category.id}
+                        href={`/category/${category.permalink}`}
+                        className="block px-4 py-2 hover:bg-gray-100 text-gray-700 capitalize transition-colors duration-200"
+                      >
+                        {category.nama}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </li>
               <li>
                 <a

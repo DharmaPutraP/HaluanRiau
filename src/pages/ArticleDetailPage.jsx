@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Tag from "../components/Tag";
 import Badge from "../components/Badge";
 import {
@@ -132,7 +133,6 @@ function ArticleDetailPage() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);
-    alert("Link berhasil disalin!");
   };
 
   // If loading
@@ -171,15 +171,81 @@ function ArticleDetailPage() {
     );
   }
 
+  // Prepare meta tag content
+  const pageTitle = article
+    ? `${article.judul_berita} - Riau Mandiri`
+    : "Riau Mandiri - Portal Berita Riau Terkini";
+  const pageDescription = article
+    ? article.description || article.judul_berita
+    : "Portal berita terkini Riau";
+
+  // Ensure image URL is absolute and properly encoded for social media sharing
+  const getAbsoluteImageUrl = (imageUrl) => {
+    if (!imageUrl) return "https://riaumandiri.co/LogoKecil.png";
+
+    let finalUrl = imageUrl;
+
+    // If it's a relative URL, make it absolute
+    if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+      finalUrl = imageUrl.startsWith("/")
+        ? `https://assets.riaumandiri.co${imageUrl}`
+        : `https://assets.riaumandiri.co/${imageUrl}`;
+    }
+
+    // Encode spaces and special characters for social media compatibility
+    // Replace spaces with %20 manually to ensure proper encoding
+    finalUrl = finalUrl.replace(/ /g, "%20");
+    return finalUrl;
+  };
+
+  const pageImage = article
+    ? getAbsoluteImageUrl(article.gambar)
+    : "https://riaumandiri.co/LogoKecil.png";
+  const pageUrl = window.location.href;
+
+  console.log(pageImage);
+
   return (
     <>
+      {/* Dynamic Meta Tags for Social Media Sharing */}
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={pageUrl} />
+        <meta
+          property="og:title"
+          content={article?.judul_berita || pageTitle}
+        />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={pageImage} />
+        <meta property="og:image:secure_url" content={pageImage} />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Riau Mandiri" />
+        {article?.tanggal && (
+          <meta property="article:published_time" content={article.tanggal} />
+        )}
+        {article?.reporter && (
+          <meta property="article:author" content={article.reporter} />
+        )}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta
+          name="twitter:title"
+          content={article?.judul_berita || pageTitle}
+        />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={pageImage} />
+      </Helmet>
+
       <div className="w-full sm:w-10/12 px-2 sm:px-4 mx-auto">
         <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">
-          {/* Tag */}
-          {/* <div className="mb-3">
-          <Tag judul={article.tag} className="text-xs md:text-sm" />
-        </div> */}
-
           {/* Article Title */}
           <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2">
             {article.judul_berita}
@@ -204,46 +270,55 @@ function ArticleDetailPage() {
                 </svg>
                 <span className="font-medium">{article.tanggal}</span>
               </div>
-              <span className="hidden sm:inline">|</span>
-              <div className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span>
-                  <span className="font-semibold">Reporter:</span>{" "}
-                  {article.reporter || "Redaksi"}
-                </span>
-              </div>
-              <span className="hidden sm:inline">|</span>
-              <div className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                <span>
-                  <span className="font-semibold">Penulis:</span>{" "}
-                  {article.penulis}
-                </span>
-              </div>
+              {article.reporter && (
+                <>
+                  <span className="hidden sm:inline">|</span>
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span>
+                      <span className="font-semibold">Reporter:</span>{" "}
+                      {article.reporter}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {article.penulis && (
+                <>
+                  <span className="hidden sm:inline">|</span>
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span>
+                      <span className="font-semibold">Penulis:</span>{" "}
+                      {article.penulis}
+                    </span>
+                  </div>
+                </>
+              )}
               {article.sumber && (
                 <>
                   <span className="hidden sm:inline">|</span>
@@ -354,13 +429,13 @@ function ArticleDetailPage() {
                       className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-gray-100 transition"
                     >
                       <svg
-                        className="w-5 h-5 text-sky-500"
+                        className="w-5 h-5 text-black"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
-                      <span className="text-gray-700">Twitter</span>
+                      <span className="text-gray-700">X (Twitter)</span>
                     </button>
 
                     <button
@@ -465,8 +540,29 @@ function ArticleDetailPage() {
               </span>
               <Tag judul={article.nama_kategori} className="text-xs" />
             </div>
-            {/* <Badge /> */}
           </div>
+
+          {/* Badge Section */}
+          {article.tags && (
+            <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs sm:text-sm font-bold text-gray-700">
+                  Tags:
+                </span>
+                {article.tags.length > 0 &&
+                  article.tags.map((tag, index) => (
+                    <Badge key={index} judul={tag} className="text-xs" />
+                  ))}
+              </div>
+              {/* <div className="text-xs text-gray-400 mt-1">
+              Debug:{" "}
+              {JSON.stringify({
+                tags: article.tags,
+                hasLength: article.tags?.length,
+              })}
+            </div> */}
+            </div>
+          )}
 
           {/* Related Articles - Only show if there are articles */}
           {/* {relatedArticles && relatedArticles.length > 0 && (

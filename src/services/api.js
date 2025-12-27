@@ -75,12 +75,9 @@ const fetchWithCache = async (url, options = {}) => {
   if (useCache) {
     const cached = apiCache.get(cacheKey);
     if (cached) {
-      console.log(`📦 Cache hit: ${url}`);
       return cached;
     }
   }
-
-  console.log(`🌐 Fetching: ${url}`);
 
   // Fetch from API
   try {
@@ -134,7 +131,7 @@ const formatArticleData = (apiData) => {
       ? `${API_IMAGE}/foto/berita/large/${item.foto_kecil}`
       : "/image.png",
     ket_foto: item.ket_foto || "",
-    reporter: item.reporter || "Redaksi",
+    reporter: item.reporter || "",
     penulis: item.penulis || item.warta || "Redaksi",
     counter: item.counter || 0,
     timesRead: item.counter || 0,
@@ -142,6 +139,7 @@ const formatArticleData = (apiData) => {
     isi: item.isi,
     jumlah_dibaca: item.counter || 0,
     rawGambar: item.gambar, // For debugging
+    tags: item.tags || [],
   }));
 };
 
@@ -372,7 +370,10 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
   try {
     const response = await fetch(`${API_URL}/albumgaleri`);
     if (!response.ok) throw new Error("Failed to fetch galeri");
-    const data = await response.json();
+    const responseData = await response.json();
+
+    // Handle response structure - check if it has data property
+    const data = responseData.data || responseData;
 
     // Format album galeri data
     const formattedData = data.map((item) => ({
@@ -391,15 +392,15 @@ export const fetchGaleri = async (page = 1, limit = 10) => {
       foto_kecil: item.gambar
         ? `${API_IMAGE}/foto/galeri/${item.gambar}`
         : "/image.png",
-      counter: item.counter || 0,
-      timesRead: item.counter || 0,
+      counter: item.counter,
+      timesRead: item.counter,
       url: item.permalink,
       rawGambar: item.gambar,
     }));
 
     return {
       articles: formattedData,
-      pagination: {
+      pagination: responseData.pagination || {
         currentPage: 1,
         totalPages: 1,
         totalItems: formattedData.length,
@@ -446,9 +447,9 @@ export const fetchBeritaTerkini = async (
 export const fetchArticleById = async (id) => {
   try {
     // Use cache with 10 minute TTL for individual articles
-    const data = await fetchWithCache(`${API_URL}/${id}`, {
+    const data = await fetchWithCache(`${API_URL}/berita/${id}`, {
       useCache: true,
-      ttl: 10 * 60 * 1000,
+      ttl: 5 * 60 * 1000,
       params: { id },
     });
 
@@ -587,8 +588,6 @@ export const fetchAlbumById = async (id) => {
       url: albumData.permalink,
       rawGambar: albumData.gambar,
       lastUpdated: formatLastUpdated(albumData.updated_at),
-      reporter: "Redaksi",
-      penulis: "Redaksi",
       nama_kategori: "Galeri",
       permalink: "galeri",
     };

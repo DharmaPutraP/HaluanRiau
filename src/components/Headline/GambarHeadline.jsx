@@ -70,7 +70,7 @@ function GambarHeadline({ data = [] }) {
           className={`absolute bottom-0 left-0 right-0 text-white p-3 md:p-4 transition-all duration-300 z-10 ease-in-out ${
             isHovered
               ? "bg-linear-to-t from-[#EE4339] via-[#EE4339]/95 to-transparent md:translate-y-0"
-              : "bg-linear-to-t from-black/80 via-black/60 to-transparent translate-y-20 md:translate-y-15"
+              : "bg-linear-to-t from-black/80 via-black/60 to-transparent translate-y-15 md:translate-y-15"
           }`}
         >
           <Tag
