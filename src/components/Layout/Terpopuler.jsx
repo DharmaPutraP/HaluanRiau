@@ -65,7 +65,7 @@ function Terpopuler({ data = [] }) {
 
         {/* Banner in the middle (only if banner exists) */}
         {banner && banner.image && (
-          <div className="my-4">
+          <div className="my-4 w-full aspect-video overflow-hidden rounded">
             <img
               src={banner.image}
               alt={banner.judul}

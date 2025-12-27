@@ -203,8 +203,6 @@ function ArticleDetailPage() {
     : "https://riaumandiri.co/LogoKecil.png";
   const pageUrl = window.location.href;
 
-  console.log(pageImage);
-
   return (
     <>
       {/* Dynamic Meta Tags for Social Media Sharing */}
@@ -543,16 +541,18 @@ function ArticleDetailPage() {
           </div>
 
           {/* Badge Section */}
-          {article.tags && (
+          {article.tags.length > 0 && (
             <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs sm:text-sm font-bold text-gray-700">
                   Tags:
                 </span>
-                {article.tags.length > 0 &&
-                  article.tags.map((tag, index) => (
-                    <Badge key={index} judul={tag} className="text-xs" />
-                  ))}
+                <div className="flex gap-2">
+                  {article.tags.length > 0 &&
+                    article.tags.map((tag, index) => (
+                      <Badge key={index} judul={tag} className="text-xs" />
+                    ))}
+                </div>
               </div>
               {/* <div className="text-xs text-gray-400 mt-1">
               Debug:{" "}
