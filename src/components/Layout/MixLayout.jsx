@@ -22,11 +22,11 @@ function MixLayout({ title, data = [] }) {
   return (
     <div className="bg-white mt-2 px-5 pt-2 pb-5">
       <div className="flex border-b-3 border-primary mb-3 items-center justify-center mx-auto w-fit">
-        <div className="font-bold text-center w-fit">{title}</div>
         <a
           href={getUrl(title)}
-          className="cursor-pointer hover:opacity-70 transition-opacity"
+          className="cursor-pointer hover:opacity-70 transition-opacity flex items-center space-x-2"
         >
+          <div className="font-bold text-center w-fit">{title}</div>
           <svg
             fill="currentColor"
             viewBox="0 0 24 24"

@@ -26,11 +26,11 @@ function Terpopuler({ data = [] }) {
     <>
       <div className="bg-white mt-2 px-5 pt-2 pb-5 h-fit">
         <div className="flex gap-2 border-b-3 w-fit border-primary mb-3 items-center">
-          <div className="font-bold">TERPOPULER</div>
           <a
             href="/category/terpopuler"
-            className="cursor-pointer hover:opacity-70 transition-opacity"
+            className="cursor-pointer hover:opacity-70 transition-opacity flex items-center space-x-2"
           >
+            <div className="font-bold">TERPOPULER</div>
             <svg
               width="800px"
               height="800px"

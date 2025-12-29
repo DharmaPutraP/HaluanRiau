@@ -7,11 +7,11 @@ function Riau({ data = [] }) {
   return (
     <div className="bg-white mt-2 md:px-5 pt-2 pb-5">
       <div className="border-b-3 w-fit border-primary mb-3 items-center mx-auto flex gap-2">
-        <div className="font-bold text-center">RIAU</div>
         <a
           href="/category/riau"
-          className="cursor-pointer hover:opacity-70 transition-opacity"
+          className="cursor-pointer hover:opacity-70 transition-opacity flex items-center space-x-2"
         >
+          <div className="font-bold text-center">RIAU</div>
           <svg
             width="800px"
             height="800px"
