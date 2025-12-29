@@ -187,23 +187,27 @@ function Navbar() {
 
         {/* Desktop Logo - Centered and shrinks on scroll */}
         <div
-          className={`hidden md:flex flex-row justify-center transition-all duration-300 ${
+          className={`hidden md:flex flex-row justify-center items-center transition-all duration-300 ${
             isScrolled ? "py-2" : "py-5"
           }`}
         >
           <a href="/">
             {isScrolled ? (
-              <img
-                src="/LogoScroll.png"
-                alt="Logo Haluan Riau"
-                className={`transition-all duration-300 w-40 h-auto}`}
-              />
+              <div className="flex justify-center items-center space-x-4">
+                <img
+                  src="/LogoScroll.png"
+                  alt="Logo Haluan Riau"
+                  className={`transition-all duration-300 w-40 h-auto}`}
+                />
+              </div>
             ) : (
-              <img
-                src="/logoBesar.png"
-                alt="Logo Haluan Riau"
-                className={`transition-all duration-300 w-3xs`}
-              />
+              <div className="flex justify-center items-center space-x-4">
+                <img
+                  src="/logoBesar.png"
+                  alt="Logo Haluan Riau"
+                  className={`transition-all duration-300 w-3xs`}
+                />
+              </div>
             )}
           </a>
         </div>

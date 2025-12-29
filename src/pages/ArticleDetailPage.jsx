@@ -245,7 +245,16 @@ function ArticleDetailPage() {
       <div className="w-full sm:w-10/12 px-2 sm:px-4 mx-auto">
         <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">
           {/* Article Title */}
-          <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2">
+          <h1
+            className={`text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 leading-tight text-gray-900 border-b-4 border-[#EE4339] pb-2 ${
+              article.judul_khusus ? " flex flex-col " : ""
+            } `}
+          >
+            {article.judul_khusus && (
+              <span className="text-sm text-gray-600 ">
+                {article.judul_khusus}
+              </span>
+            )}
             {article.judul_berita}
           </h1>
 
@@ -311,7 +320,7 @@ function ArticleDetailPage() {
                       />
                     </svg>
                     <span>
-                      <span className="font-semibold">Penulis:</span>{" "}
+                      <span className="font-semibold">Editor:</span>{" "}
                       {article.penulis}
                     </span>
                   </div>
@@ -541,28 +550,30 @@ function ArticleDetailPage() {
           </div>
 
           {/* Badge Section */}
-          {article.tags.length > 0 && (
-            <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold text-gray-700">
-                  Tags:
-                </span>
-                <div className="flex gap-2">
-                  {article.tags.length > 0 &&
-                    article.tags.map((tag, index) => (
-                      <Badge key={index} judul={tag} className="text-xs" />
-                    ))}
-                </div>
-              </div>
-              {/* <div className="text-xs text-gray-400 mt-1">
+          {!isGaleri ||
+            article.tags.length >
+              0(
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs sm:text-sm font-bold text-gray-700">
+                      Tags:
+                    </span>
+                    <div className="flex gap-2">
+                      {article.tags.length > 0 &&
+                        article.tags.map((tag, index) => (
+                          <Badge key={index} judul={tag} className="text-xs" />
+                        ))}
+                    </div>
+                  </div>
+                  {/* <div className="text-xs text-gray-400 mt-1">
               Debug:{" "}
               {JSON.stringify({
                 tags: article.tags,
                 hasLength: article.tags?.length,
               })}
             </div> */}
-            </div>
-          )}
+                </div>
+              )}
 
           {/* Related Articles - Only show if there are articles */}
           {/* {relatedArticles && relatedArticles.length > 0 && (

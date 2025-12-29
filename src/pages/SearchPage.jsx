@@ -8,13 +8,38 @@ function SearchPage() {
   const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalArticles, setTotalArticles] = useState(0);
+  const articlesPerPage = 10;
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
+
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const data = await fetchSearchResults(query);
+        const response = await fetchSearchResults(
+          query,
+          currentPage,
+          articlesPerPage,
+          filterStartDate || null,
+          filterEndDate || null
+        );
+
+        const data = response.articles || response;
+        const pagination = response.pagination;
+
         setArticles(data);
+
+        if (pagination?.totalPages) {
+          setTotalArticles(
+            pagination.totalItems || pagination.totalPages * articlesPerPage
+          );
+        }
       } catch (error) {
         console.error("Error loading search results:", error);
       } finally {
@@ -24,8 +49,60 @@ function SearchPage() {
 
     if (query) {
       loadData();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [query]);
+  }, [query, currentPage, filterStartDate, filterEndDate]);
+
+  const handleSearch = () => {
+    setFilterStartDate(startDate);
+    setFilterEndDate(endDate);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilter = () => {
+    setStartDate("");
+    setEndDate("");
+    setFilterStartDate("");
+    setFilterEndDate("");
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(totalArticles / articlesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+
+      let startPage = Math.max(2, currentPage - 2);
+      let endPage = Math.min(totalPages - 1, currentPage + 2);
+
+      if (currentPage <= 4) endPage = 6;
+      if (currentPage >= totalPages - 3) startPage = totalPages - 5;
+
+      if (startPage > 2) pages.push("...");
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
+      if (endPage < totalPages - 1) pages.push("...");
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
 
   if (loading) {
     return (
@@ -37,18 +114,18 @@ function SearchPage() {
       </div>
     );
   }
-
   return (
     <div className="w-full px-2 sm:px-4">
       <div className="bg-white px-3 sm:px-5 md:px-10 py-4 sm:py-6">
         {/* Header with Search Query */}
-        <div className="mb-4 sm:mb-6 pb-2 border-b-4 border-primary">
+        <div className="mb-4 sm:mb-6 pb-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b-4 border-primary">
+          {/* Title */}
           <div className="flex items-center gap-2 md:gap-3 pb-2 w-fit flex-wrap">
             <h1 className="text-base sm:text-lg md:text-2xl font-bold break-words">
               HASIL PENCARIAN: "{decodeURIComponent(query)}"
             </h1>
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 flex-shrink-0"
+              className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -61,9 +138,49 @@ function SearchPage() {
               />
             </svg>
           </div>
-          <p className="text-xs sm:text-sm text-gray-600 mt-2">
-            Ditemukan {articles.length} artikel
-          </p>
+
+          {/* Date Filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
+            {(filterStartDate || filterEndDate) && (
+              <button
+                onClick={handleClearFilter}
+                className="px-4 py-2 bg-gray-500 text-white rounded text-xs sm:text-sm"
+              >
+                RESET
+              </button>
+            )}
+
+            <button
+              onClick={handleSearch}
+              disabled={!startDate && !endDate}
+              className={`px-4 py-2 rounded text-xs sm:text-sm font-semibold ${
+                startDate || endDate
+                  ? "bg-[#EE4339] text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              CARI
+            </button>
+
+            <div className="flex items-center gap-2 border border-gray-300 rounded px-3 py-2">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                max={today}
+                className="outline-none text-xs sm:text-sm"
+              />
+              <span>-</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                max={today}
+                min={startDate || undefined}
+                className="outline-none text-xs sm:text-sm"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Articles List */}
@@ -89,7 +206,7 @@ function SearchPage() {
               Tidak ditemukan artikel yang sesuai dengan pencarian Anda
             </p>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate.push("/")}
               className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-[#EE4339] text-white rounded hover:bg-[#d63330] transition"
             >
               Kembali ke Beranda
@@ -155,6 +272,59 @@ function SearchPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+            <div className="text-xs sm:text-sm text-gray-600">
+              Halaman {currentPage} dari {totalPages}
+            </div>
+
+            <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`px-3 py-2 text-sm rounded ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-400"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                Prev
+              </button>
+
+              {getPageNumbers().map((page, i) =>
+                page === "..." ? (
+                  <span key={i} className="px-2 py-2 text-gray-500">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-2 text-sm rounded ${
+                      currentPage === page
+                        ? "bg-[#EE4339] text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-2 text-sm rounded ${
+                  currentPage === totalPages
+                    ? "bg-gray-200 text-gray-400"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

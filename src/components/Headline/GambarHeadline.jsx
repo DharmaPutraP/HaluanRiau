@@ -10,7 +10,7 @@ function GambarHeadline({ data = [] }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % data.length);
-    }, 3000);
+    }, 4500);
 
     return () => clearInterval(interval);
   }, [data.length]);
@@ -20,8 +20,17 @@ function GambarHeadline({ data = [] }) {
   const currentItem = data[currentSlide];
 
   // Get first 10 words of description
+  const removeHTMLTags = (str) => {
+    // Remove all HTML tags and replace HTML entities (like &nbsp;)
+    return str
+      .replace(/&nbsp;/g, " ") // Replace &nbsp; with a normal space
+      .replace(/<[^>]*>/g, "") // Remove HTML tags
+      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
+      .trim(); // Remove leading/trailing spaces
+  };
+
   const shortDescription =
-    currentItem.description.split(" ").slice(0, 10).join(" ") + "...";
+    removeHTMLTags(currentItem.isi).split(" ").slice(0, 15).join(" ") + "...";
 
   return (
     <div className="flex-initial md:border-x md:px-5 relative w-full md:w-7/12">

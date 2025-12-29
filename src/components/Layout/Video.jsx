@@ -197,7 +197,7 @@ function Video() {
   };
 
   return (
-    <div className="mt-2 relative scrollbar-hide">
+    <div className="mt-2 relative scrollbar-hide ">
       {/* Video Slider Container */}
       <div className="relative px-0 sm:px-4 md:px-10">
         {/* Left Arrow Button */}
@@ -225,7 +225,7 @@ function Video() {
         </button>
 
         {/* Video Grid */}
-        <div className="bg-white py-3 sm:py-5">
+        <div className="bg-white py-3 sm:py-5 ">
           {/* Title */}
           <div className="flex gap-1 border-b-3 w-fit border-primary mb-3 justify-center mx-auto items-center">
             <div className="font-bold text-lg sm:text-xl">VIDEO</div>

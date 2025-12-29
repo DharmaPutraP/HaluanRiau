@@ -75,7 +75,7 @@ function Headline({ data = [] }) {
           )}
 
           {/* Headlines in single column */}
-          <div className="flex flex-col gap-3">
+          <div className="hidden sm:flex flex-col gap-3">
             {[...leftHeadlines, ...rightHeadlines].map((item, index) => (
               <a
                 key={index}

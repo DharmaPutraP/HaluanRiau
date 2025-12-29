@@ -179,6 +179,39 @@ function Footer() {
                   RIAU
                 </a>
               </li>
+
+              <li>
+                <a
+                  href="/category/politik"
+                  className="hover:text-[#EE4339] transition-colors duration-200"
+                >
+                  POLITIK
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/category/ekonomi"
+                  className="hover:text-[#EE4339] transition-colors duration-200"
+                >
+                  EKONOMI
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/category/olahraga"
+                  className="hover:text-[#EE4339] transition-colors duration-200"
+                >
+                  OLAHRAGA
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/category/teknologi"
+                  className="hover:text-[#EE4339] transition-colors duration-200"
+                >
+                  TEKNOLOGI
+                </a>
+              </li>
               <li className="relative">
                 <button
                   onClick={() => setIsArchiveOpen(!isArchiveOpen)}
@@ -215,38 +248,6 @@ function Footer() {
                     ))}
                   </div>
                 )}
-              </li>
-              <li>
-                <a
-                  href="/category/politik"
-                  className="hover:text-[#EE4339] transition-colors duration-200"
-                >
-                  POLITIK
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/category/ekonomi"
-                  className="hover:text-[#EE4339] transition-colors duration-200"
-                >
-                  EKONOMI
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/category/olahraga"
-                  className="hover:text-[#EE4339] transition-colors duration-200"
-                >
-                  OLAHRAGA
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/category/teknologi"
-                  className="hover:text-[#EE4339] transition-colors duration-200"
-                >
-                  TEKNOLOGI
-                </a>
               </li>
             </ul>
           </div>

@@ -50,7 +50,7 @@ function PilihanEditor({ data = [] }) {
         {topSix.map((item, index) => (
           <div
             key={index}
-            className={`${index !== 0 && index !== 1 ? "pt-5" : ""} w-full`}
+            className={`${index !== 0 && index !== 1 ? "pt-5" : "pt-3"} w-full`}
           >
             <MenuPilihanEditor
               judul={item.judul}

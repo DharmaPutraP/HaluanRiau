@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import Tag from "../Tag";
 
-function LeftHeadline({ data = [] }) {
+function LeftHeadline({ data = [], className = "" }) {
   return (
-    <div className="flex-initial flex flex-col w-full md:w-1/4 gap-4">
+    <div
+      className={`flex-initial flex flex-col w-full md:w-1/4 gap-4 ${className}`}
+    >
       {data.map((item, index) => (
         <Link
           key={index}

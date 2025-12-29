@@ -114,6 +114,7 @@ const formatArticleData = (apiData) => {
     id: item.id_berita,
     judul: item.judul_berita,
     judul_berita: item.judul_berita, // Keep original for article detail page
+    judul_khusus: item.judul_khusus || "",
     tag: item.nama_kategori,
     nama_kategori: item.nama_kategori, // Add nama_kategori separately
     permalink: item.permalink, // Add permalink for category
@@ -612,16 +613,40 @@ export const fetchRelatedArticles = async (articleId, limit = 2) => {
   }
 };
 
-export const fetchSearchResults = async (query) => {
+export const fetchSearchResults = async (
+  query,
+  page = 1,
+  limit = 10,
+  startDate = null,
+  endDate = null
+) => {
   try {
-    const response = await fetch(
-      `${API_URL}/search/${encodeURIComponent(query)}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch search results");
-    const data = await response.json();
-    return formatArticleData(data);
+    let url = `${API_URL}/search?judul=${encodeURIComponent(
+      query
+    )}&halaman=${page}&limit=${limit}`;
+
+    if (startDate) url += `&start_date=${startDate}`;
+    if (endDate) url += `&end_date=${endDate}`;
+
+    const responseData = await fetchWithCache(url, {
+      useCache: true,
+      ttl: 5 * 60 * 1000,
+      params: { query, page, limit, startDate, endDate },
+    });
+
+    const data = responseData.data || responseData;
+    const pagination = responseData.pagination || null;
+
+    return {
+      articles: formatArticleData(data),
+      pagination: pagination,
+    };
   } catch (error) {
-    return [];
+    console.error("Search fetch error:", error);
+    return {
+      articles: [],
+      pagination: null,
+    };
   }
 };
 
