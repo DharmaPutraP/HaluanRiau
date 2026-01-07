@@ -78,7 +78,10 @@ function Navbar() {
       }
 
       // Add unpinned categories to overflow
-      overflow.push(...unpinnedCategories);
+      const nonArchiveCategories = unpinnedCategories.filter(
+        (cat) => !cat.archive
+      );
+      overflow.push(...nonArchiveCategories);
 
       setVisibleCategories(visible);
       setOverflowCategories(overflow);

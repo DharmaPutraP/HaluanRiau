@@ -85,7 +85,7 @@ function ContentBottomSections() {
       <div className="flex flex-col md:grid md:grid-cols-4 gap-2">
         {nasional.length > 0 && <MixLayout title="NASIONAL" data={nasional} />}
         {tipsKesehatan.length > 0 && (
-          <MixLayout title="TIPS & KESEHATAN" data={tipsKesehatan} />
+          <MixLayout title="Gaya Hidup" data={tipsKesehatan} />
         )}
         {advertorial.length > 0 && (
           <MixLayout title="ADVERTORIAL" data={advertorial} />

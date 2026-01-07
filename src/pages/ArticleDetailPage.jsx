@@ -114,11 +114,17 @@ function ArticleDetailPage() {
   }, [id]);
 
   // Share functions
-  const shareUrl = window.location.href;
+  // const shareUrl = window.location.href;
+  // const updatedUrl = shareUrl.replace(
+  //   "riaumandiri.co",
+  //   "editor.riaumandiri.co/share"
+  // );
+  // const finalUrl = updatedUrl.replace(/^www\./, "");
+  const finalUrl = "https://editor.riaumandiri.co/share" + location.pathname;
   const shareTitle = article ? article.judul : "";
 
   const handleShare = (platform) => {
-    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedUrl = encodeURIComponent(finalUrl);
     const encodedTitle = encodeURIComponent(shareTitle);
 
     const shareLinks = {
@@ -132,7 +138,7 @@ function ArticleDetailPage() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard.writeText(finalUrl);
   };
 
   // If loading
@@ -171,46 +177,92 @@ function ArticleDetailPage() {
     );
   }
 
+  // Extract plain text from HTML content for description
+  // const extractPlainText = (htmlContent, maxLength = 160) => {
+  //   if (!htmlContent) return "";
+  //   try {
+  //     const parser = new DOMParser();
+  //     const doc = parser.parseFromString(htmlContent, "text/html");
+  //     const text = doc.body.textContent || "";
+  //     return (
+  //       text.trim().substring(0, maxLength) +
+  //       (text.length > maxLength ? "..." : "")
+  //     );
+  //   } catch (error) {
+  //     return "";
+  //   }
+  // };
+
   // Prepare meta tag content
-  const pageTitle = article
-    ? `${article.judul_berita} - Riau Mandiri`
-    : "Riau Mandiri - Portal Berita Riau Terkini";
-  const pageDescription = article
-    ? article.description || article.judul_berita
-    : "Portal berita terkini Riau";
+  // const pageTitle = article
+  //   ? `${article.judul_berita} - Riau Mandiri`
+  //   : "Riau Mandiri - Portal Berita Riau Terkini";
+
+  // // Enhanced description: use description field, or extract from content, or fallback to title
+  // const pageDescription = article
+  //   ? article.description ||
+  //     extractPlainText(article.isi) ||
+  //     article.judul_berita
+  //   : "Portal berita terkini Riau - Informasi terpercaya seputar berita Riau, nasional, dan internasional";
 
   // Ensure image URL is absolute and properly encoded for social media sharing
-  const getAbsoluteImageUrl = (imageUrl) => {
-    if (!imageUrl) return "https://riaumandiri.co/LogoKecil.png";
+  // const getAbsoluteImageUrl = (imageUrl) => {
+  //   let finalUrl = imageUrl;
 
-    let finalUrl = imageUrl;
+  //   // If it's a relative URL, make it absolute
+  //   if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+  //     finalUrl = imageUrl.startsWith("/")
+  //       ? `https://assets.riaumandiri.co${imageUrl}`
+  //       : `https://assets.riaumandiri.co/${imageUrl}`;
+  //   }
 
-    // If it's a relative URL, make it absolute
-    if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-      finalUrl = imageUrl.startsWith("/")
-        ? `https://assets.riaumandiri.co${imageUrl}`
-        : `https://assets.riaumandiri.co/${imageUrl}`;
-    }
+  //   // Encode spaces and special characters for social media compatibility
+  //   // Replace spaces with %20 manually to ensure proper encoding
+  //   finalUrl = finalUrl.replace(/ /g, "%20");
+  //   return finalUrl;
+  // };
 
-    // Encode spaces and special characters for social media compatibility
-    // Replace spaces with %20 manually to ensure proper encoding
-    finalUrl = finalUrl.replace(/ /g, "%20");
-    return finalUrl;
-  };
+  // const pageImage = getAbsoluteImageUrl(article.gambar);
+  // const pageUrl = window.location.href;
 
-  const pageImage = article
-    ? getAbsoluteImageUrl(article.gambar)
-    : "https://riaumandiri.co/LogoKecil.png";
-  const pageUrl = window.location.href;
+  // Prepare structured data for SEO
+  // const structuredData = article
+  //   ? {
+  //       "@context": "https://schema.org",
+  //       "@type": "NewsArticle",
+  //       headline: article.judul_berita,
+  //       image: [pageImage],
+  //       datePublished: article.tanggal,
+  //       dateModified: article.tanggal,
+  //       author: {
+  //         "@type": "Person",
+  //         name: article.reporter || article.penulis || "Riau Mandiri",
+  //       },
+  //       publisher: {
+  //         "@type": "Organization",
+  //         name: "Riau Mandiri",
+  //         logo: {
+  //           "@type": "ImageObject",
+  //           url: pageImage,
+  //         },
+  //       },
+  //       description: pageDescription,
+  //       mainEntityOfPage: {
+  //         "@type": "WebPage",
+  //         "@id": pageUrl,
+  //       },
+  //     }
+  //   : null;
 
   return (
     <>
       {/* Dynamic Meta Tags for Social Media Sharing */}
-      <Helmet>
+      {/* <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
 
-        {/* Open Graph / Facebook */}
+        <link rel="canonical" href={pageUrl} />
+
         <meta property="og:type" content="article" />
         <meta property="og:url" content={pageUrl} />
         <meta
@@ -223,15 +275,22 @@ function ArticleDetailPage() {
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content={article?.judul_berita || "Riau Mandiri"}
+        />
         <meta property="og:site_name" content="Riau Mandiri" />
+        <meta property="og:locale" content="id_ID" />
         {article?.tanggal && (
           <meta property="article:published_time" content={article.tanggal} />
         )}
         {article?.reporter && (
           <meta property="article:author" content={article.reporter} />
         )}
+        {article?.kategori && (
+          <meta property="article:section" content={article.kategori} />
+        )}
 
-        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={pageUrl} />
         <meta
@@ -240,7 +299,21 @@ function ArticleDetailPage() {
         />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={pageImage} />
-      </Helmet>
+        <meta
+          name="twitter:image:alt"
+          content={article?.judul_berita || "Riau Mandiri"}
+        />
+        <meta name="twitter:site" content="@riaumandiri" />
+
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+
+        {structuredData && (
+          <script type="application/ld+json">
+            {JSON.stringify(structuredData)}
+          </script>
+        )}
+      </Helmet> */}
 
       <div className="w-full sm:w-10/12 px-2 sm:px-4 mx-auto">
         <div className="bg-white px-3 sm:px-4 md:px-10 py-3 sm:py-4 md:py-6 mt-2">

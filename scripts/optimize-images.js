@@ -37,8 +37,6 @@ async function optimizeImage(inputPath, outputPath) {
     const ext = extname(inputPath).toLowerCase();
     const file = basename(inputPath, ext);
 
-    console.log(`📸 Optimizing: ${basename(inputPath)}`);
-
     // Get original file size
     const originalStats = await stat(inputPath);
     const originalSize = (originalStats.size / 1024).toFixed(2);
@@ -62,7 +60,6 @@ async function optimizeImage(inputPath, outputPath) {
     } else if (ext === ".webp") {
       await image.webp(QUALITY_SETTINGS.webp).toFile(outputPath);
     } else {
-      console.log(`⏭️  Skipping unsupported format: ${ext}`);
       return;
     }
 
@@ -90,14 +87,8 @@ async function optimizeImage(inputPath, outputPath) {
       (1 - webpStats.size / originalStats.size) *
       100
     ).toFixed(1);
-
-    console.log(`   ✅ Original: ${originalSize}KB`);
-    console.log(
-      `   ✅ Optimized (${ext}): ${optimizedSize}KB (${savings}% smaller)`
-    );
-    console.log(`   ✅ WebP: ${webpSize}KB (${webpSavings}% smaller)`);
   } catch (error) {
-    console.error(`   ❌ Error optimizing ${inputPath}:`, error.message);
+    console.error(`   ❌ Error optimizing `);
   }
 }
 
@@ -130,21 +121,11 @@ async function processDirectory(dir, outputDir) {
 }
 
 async function main() {
-  console.log("🚀 Starting image optimization...\n");
-
   // Create output directory
   await mkdir(OUTPUT_DIR, { recursive: true });
 
   // Process all images
   await processDirectory(PUBLIC_DIR, OUTPUT_DIR);
-
-  console.log("\n✅ Image optimization complete!");
-  console.log(`📁 Optimized images saved to: ${OUTPUT_DIR}`);
-  console.log("\n💡 Next steps:");
-  console.log("1. Review the optimized images");
-  console.log("2. Replace original images with optimized versions");
-  console.log("3. Update your components to use <OptimizedImage> component");
-  console.log("4. Consider using WebP format for better compression");
 }
 
 main().catch(console.error);

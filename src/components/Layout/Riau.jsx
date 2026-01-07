@@ -36,7 +36,7 @@ function Riau({ data = [] }) {
             <BasicArtikel
               title={item.judul}
               image={true}
-              imageUrl={item.foto_kecil}
+              imageUrl={item.gambar}
               date={item.tanggal}
               id={item.id}
               url={item.url}
@@ -57,7 +57,7 @@ function Riau({ data = [] }) {
             <BasicArtikel
               title={item.judul}
               image={true}
-              imageUrl={item.foto_kecil}
+              imageUrl={item.gambar}
               date={item.tanggal}
               id={item.id}
               url={item.url}

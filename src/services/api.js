@@ -360,7 +360,7 @@ export const fetchTipsKesehatan = async (
   endDate = null
 ) => {
   return await fetchByKategori(
-    "tips&kesehatan",
+    "gayahidup",
     page,
     limit,
     startDate,
@@ -511,7 +511,7 @@ export const fetchByCategory = async (
     gagasan: fetchGagasan,
     riau: fetchRiau,
     nasional: fetchNasional,
-    "tips-kesehatan": fetchTipsKesehatan,
+    "gayahidup": fetchTipsKesehatan,
     advertorial: fetchAdvertorial,
     galeri: fetchGaleri,
   };
@@ -768,8 +768,9 @@ export const fetchCategories = async () => {
       id: item.id_kategori,
       nama: item.nama_kategori,
       permalink: item.permalink,
-      pin: item.pin === 1 || item.pin === true, // Convert to boolean
+      pin: item.pin === 1 || item.pin === true,
       urutan: item.urutan || 0,
+      archive: item.archive === 1 || item.archive === true,
     }));
 
     // Sort by urutan (order)

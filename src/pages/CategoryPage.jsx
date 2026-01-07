@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, data } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Tag from "../components/Tag";
 import { fetchByCategory } from "../services/api";
 import ContentBottomSections from "../components/ContentBottomSections";
@@ -30,7 +30,7 @@ function CategoryPage() {
     riau: { title: "RIAU" },
     zonariau: { title: "RIAU" },
     nasional: { title: "NASIONAL" },
-    "tips-kesehatan": { title: "TIPS & KESEHATAN" },
+    gayahidup: { title: "GAYA HIDUP" },
     advertorial: { title: "ADVERTORIAL" },
     galeri: { title: "GALERI" },
   };
@@ -329,13 +329,9 @@ function CategoryPage() {
               const baseRoute = isGaleriItem ? "/galeri" : "/article";
 
               return (
-                <div
+                <Link
                   key={index}
-                  onClick={() =>
-                    navigate(
-                      `${baseRoute}/${article.id}/${article.url || article.id}`
-                    )
-                  }
+                  to={`${baseRoute}/${article.id}/${article.url || article.id}`}
                   className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 p-3 sm:p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition rounded"
                 >
                   {/* Left: Content */}
@@ -378,7 +374,7 @@ function CategoryPage() {
                       />
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

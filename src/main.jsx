@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App.jsx";
 import { initGA } from "./utils/analytics";
+import "@fontsource/inter";
 
 // Initialize Google Analytics
 initGA();

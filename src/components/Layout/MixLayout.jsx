@@ -10,7 +10,7 @@ function MixLayout({ title, data = [] }) {
   const getUrl = (title) => {
     const urlMap = {
       NASIONAL: "/category/nasional",
-      "TIPS & KESEHATAN": "/category/tips-kesehatan",
+      "GAYA HIDUP": "/category/gayahidup",
       ADVETORIAL: "/category/advertorial",
       GALERI: "/category/galeri",
     };
@@ -50,7 +50,7 @@ function MixLayout({ title, data = [] }) {
               <BasicArtikel
                 title={item.judul}
                 image={true}
-                imageUrl={item.foto_kecil}
+                imageUrl={item.gambar}
                 date={item.tanggal}
                 id={item.id}
                 url={item.url}
@@ -62,7 +62,7 @@ function MixLayout({ title, data = [] }) {
               <BasicArtikel
                 title={item.judul}
                 image={false}
-                imageUrl={item.foto_kecil}
+                imageUrl={item.gambar}
                 date={item.tanggal}
                 id={item.id}
                 url={item.url}

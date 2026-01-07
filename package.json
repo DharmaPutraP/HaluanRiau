@@ -12,6 +12,7 @@
     "deploy": "npm run build:prod && powershell -File ./deploy.ps1"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.1.17",
     "dompurify": "^3.3.1",
     "react": "^19.2.0",

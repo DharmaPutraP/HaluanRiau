@@ -64,7 +64,7 @@ function BeritaTerkiniComponent({ data = [] }) {
             {/* Image first on mobile, right side on desktop */}
             <div className="w-full md:w-3/12 md:order-2">
               <img
-                src={item.foto_kecil}
+                src={item.gambar}
                 alt={item.judul}
                 className="w-full h-32 md:h-30 object-cover rounded"
               />

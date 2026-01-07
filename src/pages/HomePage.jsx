@@ -248,7 +248,7 @@ function HomePage() {
           <MixLayoutSkeleton />
         )}
         {tipsKesehatan.length > 0 ? (
-          <MixLayout title="TIPS & KESEHATAN" data={tipsKesehatan} />
+          <MixLayout title="GAYA HIDUP" data={tipsKesehatan} />
         ) : (
           <MixLayoutSkeleton />
         )}
