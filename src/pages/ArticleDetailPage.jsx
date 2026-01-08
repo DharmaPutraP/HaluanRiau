@@ -120,7 +120,7 @@ function ArticleDetailPage() {
   //   "editor.riaumandiri.co/share"
   // );
   // const finalUrl = updatedUrl.replace(/^www\./, "");
-  const finalUrl = "https://editor.riaumandiri.co/share" + location.pathname;
+  const finalUrl = "https://haluan.riaumandiri.co/share" + location.pathname;
   const shareTitle = article ? article.judul : "";
 
   const handleShare = (platform) => {
